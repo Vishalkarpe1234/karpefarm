@@ -1,4 +1,5 @@
 'use client'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -7,64 +8,40 @@ import { GiPlantSeed, GiWateringCan, GiTreehouse, GiWheat, GiFarmTractor, GiSpro
 import { FiArrowRight, FiCheck } from 'react-icons/fi'
 import Link from 'next/link'
 
-const services = [
-  {
-    icon: GiPlantSeed,
-    title: 'Organic Farming',
-    desc: 'We use only organic inputs and traditional methods combined with modern technology to produce chemical-free, nutritious crops.',
-    features: ['No harmful pesticides', 'Natural compost', 'Soil health preservation', 'Biodiversity maintenance'],
-    color: 'from-green-500 to-emerald-600',
-    bg: 'bg-green-50',
-    iconColor: 'text-green-600',
-  },
-  {
-    icon: GiWateringCan,
-    title: 'Drip Irrigation',
-    desc: 'Advanced drip irrigation systems for water conservation and optimal crop growth throughout the season.',
-    features: ['70% water savings', 'Uniform water distribution', 'Fertigation support', 'Automation capability'],
-    color: 'from-blue-500 to-cyan-600',
-    bg: 'bg-blue-50',
-    iconColor: 'text-blue-600',
-  },
-  {
-    icon: GiTreehouse,
-    title: 'Orchard Management',
-    desc: 'Professional orchard care for coconut, mango, chiku, and citrus plantations with seasonal harvesting.',
-    features: ['Pruning & shaping', 'Pest management', 'Harvest planning', 'Post-harvest care'],
-    color: 'from-amber-500 to-orange-600',
-    bg: 'bg-amber-50',
-    iconColor: 'text-amber-600',
-  },
-  {
-    icon: GiFarmTractor,
-    title: 'Contract Farming',
-    desc: 'We partner with businesses and retailers to provide fresh produce on contract basis with guaranteed supply.',
-    features: ['Guaranteed supply', 'Custom quantity', 'Regular delivery', 'Quality assurance'],
-    color: 'from-purple-500 to-violet-600',
-    bg: 'bg-purple-50',
-    iconColor: 'text-purple-600',
-  },
-  {
-    icon: GiWheat,
-    title: 'Crop Consultation',
-    desc: 'Expert agricultural consultation for farmers looking to improve their yield and adopt sustainable practices.',
-    features: ['Soil testing', 'Crop planning', 'Pest analysis', 'Marketing guidance'],
-    color: 'from-teal-500 to-green-600',
-    bg: 'bg-teal-50',
-    iconColor: 'text-teal-600',
-  },
-  {
-    icon: GiSprout,
-    title: 'Seedling Supply',
-    desc: 'Quality seedlings and saplings for vegetables, fruits, and ornamental plants from our nursery.',
-    features: ['Disease-free saplings', 'High-yield varieties', 'Expert guidance', 'Seasonal availability'],
-    color: 'from-lime-500 to-green-600',
-    bg: 'bg-lime-50',
-    iconColor: 'text-lime-700',
-  },
+const DEFAULT_ICONS = [GiPlantSeed, GiWateringCan, GiTreehouse, GiFarmTractor, GiWheat, GiSprout]
+const DEFAULT_COLORS = [
+  { grad: 'from-green-500 to-emerald-600', bg: 'bg-green-50', icon: 'text-green-600' },
+  { grad: 'from-blue-500 to-cyan-600', bg: 'bg-blue-50', icon: 'text-blue-600' },
+  { grad: 'from-amber-500 to-orange-600', bg: 'bg-amber-50', icon: 'text-amber-600' },
+  { grad: 'from-purple-500 to-violet-600', bg: 'bg-purple-50', icon: 'text-purple-600' },
+  { grad: 'from-teal-500 to-green-600', bg: 'bg-teal-50', icon: 'text-teal-600' },
+  { grad: 'from-lime-500 to-green-600', bg: 'bg-lime-50', icon: 'text-lime-700' },
 ]
 
+const DEFAULT_SERVICES = [
+  { id: '1', title: 'Organic Farming', description: 'We use only organic inputs and traditional methods combined with modern technology to produce chemical-free, nutritious crops.', features: 'No harmful pesticides,Natural compost,Soil health preservation,Biodiversity maintenance' },
+  { id: '2', title: 'Drip Irrigation', description: 'Advanced drip irrigation systems for water conservation and optimal crop growth throughout the season.', features: '70% water savings,Uniform water distribution,Fertigation support,Automation capability' },
+  { id: '3', title: 'Orchard Management', description: 'Professional orchard care for coconut, mango, chiku, and citrus plantations with seasonal harvesting.', features: 'Pruning & shaping,Pest management,Harvest planning,Post-harvest care' },
+  { id: '4', title: 'Contract Farming', description: 'We partner with businesses and retailers to provide fresh produce on contract basis with guaranteed supply.', features: 'Guaranteed supply,Custom quantity,Regular delivery,Quality assurance' },
+  { id: '5', title: 'Crop Consultation', description: 'Expert agricultural consultation for farmers looking to improve their yield and adopt sustainable practices.', features: 'Soil testing,Crop planning,Pest analysis,Marketing guidance' },
+  { id: '6', title: 'Seedling Supply', description: 'Quality seedlings and saplings for vegetables, fruits, and ornamental plants from our nursery.', features: 'Disease-free saplings,High-yield varieties,Expert guidance,Seasonal availability' },
+]
+
+interface DbService { id: string; title: string; description: string; features: string }
+
 export default function ServicesPage() {
+  const [services, setServices] = useState(DEFAULT_SERVICES)
+
+  useEffect(() => {
+    fetch('/api/admin/content?section=services')
+      .then(r => r.json())
+      .then(data => {
+        const dbList = data.content?.extraData?.services
+        if (Array.isArray(dbList) && dbList.length > 0) setServices(dbList)
+      })
+      .catch(() => {})
+  }, [])
+
   return (
     <main className="min-h-screen bg-gray-50">
       <NatureBackground />
@@ -94,34 +71,39 @@ export default function ServicesPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service, i) => (
-              <motion.div
-                key={service.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -6 }}
-                className="bg-white rounded-2xl shadow-card hover:shadow-nature transition-all overflow-hidden border border-gray-100"
-              >
-                <div className={`h-2 bg-gradient-to-r ${service.color}`} />
-                <div className="p-6">
-                  <div className={`w-14 h-14 ${service.bg} rounded-2xl flex items-center justify-center mb-4`}>
-                    <service.icon className={service.iconColor} size={30} />
+            {services.map((service: DbService, i: number) => {
+              const Icon = DEFAULT_ICONS[i % DEFAULT_ICONS.length]
+              const color = DEFAULT_COLORS[i % DEFAULT_COLORS.length]
+              const featureList = service.features.split(',').map(f => f.trim()).filter(Boolean)
+              return (
+                <motion.div
+                  key={service.id || service.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ y: -6 }}
+                  className="bg-white rounded-2xl shadow-card hover:shadow-nature transition-all overflow-hidden border border-gray-100"
+                >
+                  <div className={`h-2 bg-gradient-to-r ${color.grad}`} />
+                  <div className="p-6">
+                    <div className={`w-14 h-14 ${color.bg} rounded-2xl flex items-center justify-center mb-4`}>
+                      <Icon className={color.icon} size={30} />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{service.title}</h3>
+                    <p className="text-gray-500 text-sm leading-relaxed mb-4">{service.description}</p>
+                    <ul className="space-y-2">
+                      {featureList.map((f) => (
+                        <li key={f} className="flex items-center gap-2 text-sm text-gray-700">
+                          <FiCheck className="text-green-500 shrink-0" size={14} />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{service.title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed mb-4">{service.desc}</p>
-                  <ul className="space-y-2">
-                    {service.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-sm text-gray-700">
-                        <FiCheck className="text-green-500 shrink-0" size={14} />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       </section>

@@ -1,0 +1,63 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+Thumbs.db
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# old HTML files (keep as reference but don't deploy)
+index.html
+partners.html
+contact.html
+store.html
+team.html
+services.html
+test.html
+style.css
+ekko-lightbox.css
+bootstrap.min.css
+fonts.txt
+
+# large image files (already in public/)
+asian_rice_farmer-wallpaper-5120x2880.jpg
+happy_farm-wallpaper-3840x2160.jpg
+daniel-vogel-sVothhm7iRI-unsplash.jpg
+yosemite.jpg
+turkey_PNG58612.png
+monsato.png
+shoprite-logo.jpg
+shoprite-logo-png-5.png
+carrgill.png
+"pick n pay.png"
+"spar supermarket logo.png"

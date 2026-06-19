@@ -1,0 +1,197 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --green-primary: #16a34a;
+  --green-light: #22c55e;
+  --green-dark: #14532d;
+  --brown-primary: #a86c2f;
+  --gray-bg: #f8f9fa;
+  --white: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #f8f9fa;
+  color: #1a1a1a;
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #16a34a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #14532d; }
+
+/* Floating leaves animation */
+.leaf {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  animation: leafFall linear infinite;
+  opacity: 0.6;
+  font-size: 1.5rem;
+}
+
+@keyframes leafFall {
+  0% { transform: translateY(-50px) rotate(0deg) translateX(0); opacity: 0.8; }
+  25% { transform: translateY(25vh) rotate(90deg) translateX(20px); }
+  50% { transform: translateY(50vh) rotate(180deg) translateX(-15px); }
+  75% { transform: translateY(75vh) rotate(270deg) translateX(10px); }
+  100% { transform: translateY(110vh) rotate(360deg) translateX(-5px); opacity: 0; }
+}
+
+/* Nature particles */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  animation: particleFloat ease-in-out infinite;
+}
+
+@keyframes particleFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  33% { transform: translate(15px, -20px) scale(1.1); opacity: 0.8; }
+  66% { transform: translate(-10px, 10px) scale(0.9); opacity: 0.5; }
+}
+
+/* Grass animation */
+.grass-blade {
+  display: inline-block;
+  animation: sway ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* Hero video overlay */
+.hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.2) 0%,
+    rgba(0, 0, 0, 0.4) 60%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Product card hover effect */
+.product-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(22, 163, 74, 0.2);
+}
+
+/* Shimmer loading */
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Nature gradient backgrounds */
+.bg-nature {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 40%, #f0fdf4 100%);
+}
+
+.bg-earth {
+  background: linear-gradient(135deg, #fdf8f0 0%, #f5e6d3 40%, #fdf8f0 100%);
+}
+
+/* Text gradient */
+.text-gradient-green {
+  background: linear-gradient(135deg, #15803d, #22c55e, #86efac);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Button animations */
+.btn-farm {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-farm::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-farm:hover::before {
+  left: 100%;
+}
+
+/* Floating sun rays */
+@keyframes sunRay {
+  0%, 100% { opacity: 0.3; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.6; transform: scale(1.05) rotate(5deg); }
+}
+
+/* Water ripple */
+@keyframes rippleWave {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(4); opacity: 0; }
+}
+
+.ripple-effect::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.3);
+  animation: rippleWave 1.5s ease-out infinite;
+}
+
+/* Animated underline */
+.nav-link-animated {
+  position: relative;
+}
+
+.nav-link-animated::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #22c55e;
+  transition: width 0.3s ease;
+}
+
+.nav-link-animated:hover::after,
+.nav-link-animated.active::after {
+  width: 100%;
+}
+
+/* Section separator */
+.section-divider {
+  height: 80px;
+  background: linear-gradient(to bottom right, #f0fdf4 50%, #ffffff 50%);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-title { font-size: 2rem; }
+}

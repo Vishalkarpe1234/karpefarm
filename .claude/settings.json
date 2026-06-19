@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"g:\\\\karpefarm-main\")",
+      "Bash(dir \"g:\\\\karpefarm-main\\\\logo form\")",
+      "Bash(cp \"logo karpe farm.png\" \"public/images/logo.png\")",
+      "Bash(cp \"logo farm.jpeg\" \"public/images/logo-farm.jpeg\")",
+      "Bash(cp \"main picture.jpg\" \"public/images/main-picture.jpg\")",
+      "Bash(cp \"onions.png\" \"public/images/onions.png\")",
+      "Bash(cp \"bringle.png\" \"public/images/bringle.png\")",
+      "Bash(npm install *)",
+      "Bash(git init *)",
+      "Bash(git remote *)",
+      "Bash(npm run *)",
+      "Bash(git config *)",
+      "Bash(git add *)"
+    ]
+  }
+}

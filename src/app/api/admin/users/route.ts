@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic"
 import { NextRequest, NextResponse } from 'next/server'
-import { connectDB } from '@/lib/db'
-import User from '@/lib/models/User'
+import { prisma } from '@/lib/db'
 import { verifyToken } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
 
@@ -14,29 +13,32 @@ function isAdmin(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  await connectDB()
-  const users = await User.find({ role: 'user' }).select('-password').sort({ createdAt: -1 })
+  const users = await prisma.user.findMany({
+    where: { role: 'user' },
+    select: { id: true, name: true, email: true, phone: true, address: true, isActive: true, role: true, createdAt: true },
+    orderBy: { createdAt: 'desc' },
+  })
   return NextResponse.json({ users })
 }
 
 export async function PUT(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  await connectDB()
   const { userId, name, email, phone, address, isActive, password } = await req.json()
 
   const updateData: Record<string, unknown> = { name, email, phone, address, isActive }
-  if (password) {
-    updateData.password = await bcrypt.hash(password, 12)
-  }
+  if (password) updateData.password = await bcrypt.hash(password, 12)
 
-  const user = await User.findByIdAndUpdate(userId, updateData, { new: true }).select('-password')
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: updateData,
+    select: { id: true, name: true, email: true, phone: true, address: true, isActive: true, role: true },
+  })
   return NextResponse.json({ user })
 }
 
 export async function DELETE(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  await connectDB()
   const { userId } = await req.json()
-  await User.findByIdAndDelete(userId)
+  await prisma.user.delete({ where: { id: userId } })
   return NextResponse.json({ success: true })
 }

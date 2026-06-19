@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  password      String
+  phone         String   @default("")
+  address       String   @default("")
+  profilePhoto  String   @default("")
+  role          String   @default("user")
+  isActive      Boolean  @default(true)
+  loginActivity Json     @default("[]")
+  cart          Json     @default("[]")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @default("")
+  price       Float    @default(0)
+  unit        String   @default("kg")
+  image       String   @default("")
+  category    String   @default("vegetable")
+  stock       Int      @default(100)
+  rating      Float    @default(4.5)
+  reviews     Int      @default(0)
+  isFeatured  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  userId        String
+  productId     String
+  productName   String
+  productPrice  Float
+  quantity      Int
+  totalAmount   Float
+  buyerName     String
+  buyerPhone    String
+  buyerAddress  String
+  status        String   @default("pending")
+  adminComment  String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Contact {
+  id          String   @id @default(cuid())
+  userId      String   @default("")
+  userName    String
+  userEmail   String
+  subject     String   @default("")
+  message     String
+  status      String   @default("new")
+  adminReply  String   @default("")
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Content {
+  id          String   @id @default(cuid())
+  section     String   @unique
+  title       String   @default("")
+  subtitle    String   @default("")
+  description String   @default("")
+  image       String   @default("")
+  extraData   Json?
+  updatedAt   DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  orderId   String   @default("")
+  title     String
+  message   String
+  type      String   @default("info")
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

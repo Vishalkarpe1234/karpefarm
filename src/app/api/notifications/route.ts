@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic"
 import { NextRequest, NextResponse } from 'next/server'
-import { connectDB } from '@/lib/db'
-import Notification from '@/lib/models/Notification'
+import { prisma } from '@/lib/db'
 import { verifyToken } from '@/lib/auth'
 
 function getUser(req: NextRequest) {
@@ -13,21 +12,25 @@ function getUser(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const user = getUser(req)
   if (!user?.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  await connectDB()
-  const notifications = await Notification.find({ userId: user.userId }).sort({ createdAt: -1 }).limit(50)
-  const unreadCount = await Notification.countDocuments({ userId: user.userId, isRead: false })
+
+  const notifications = await prisma.notification.findMany({
+    where: { userId: user.userId },
+    orderBy: { createdAt: 'desc' },
+    take: 50,
+  })
+  const unreadCount = await prisma.notification.count({ where: { userId: user.userId, isRead: false } })
   return NextResponse.json({ notifications, unreadCount })
 }
 
 export async function PUT(req: NextRequest) {
   const user = getUser(req)
   if (!user?.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  await connectDB()
   const { notificationId } = await req.json()
+
   if (notificationId === 'all') {
-    await Notification.updateMany({ userId: user.userId }, { isRead: true })
+    await prisma.notification.updateMany({ where: { userId: user.userId }, data: { isRead: true } })
   } else {
-    await Notification.findByIdAndUpdate(notificationId, { isRead: true })
+    await prisma.notification.update({ where: { id: notificationId }, data: { isRead: true } })
   }
   return NextResponse.json({ success: true })
 }

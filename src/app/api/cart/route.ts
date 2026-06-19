@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic"
 import { NextRequest, NextResponse } from 'next/server'
-import { connectDB } from '@/lib/db'
-import User from '@/lib/models/User'
+import { prisma } from '@/lib/db'
 import { verifyToken } from '@/lib/auth'
 
 function getUser(req: NextRequest) {
@@ -13,37 +12,49 @@ function getUser(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const user = getUser(req)
   if (!user?.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  await connectDB()
-  const dbUser = await User.findById(user.userId).populate('cart.productId')
-  return NextResponse.json({ cart: dbUser?.cart || [] })
+
+  const dbUser = await prisma.user.findUnique({ where: { id: user.userId } })
+  const cart = (dbUser?.cart as any[]) || []
+
+  // Attach product details to each cart item
+  const enriched = await Promise.all(
+    cart.map(async (item: any) => {
+      const product = await prisma.product.findUnique({ where: { id: item.productId } })
+      return { ...item, productId: product || { id: item.productId } }
+    })
+  )
+  return NextResponse.json({ cart: enriched })
 }
 
 export async function POST(req: NextRequest) {
   const user = getUser(req)
   if (!user?.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  await connectDB()
   const { productId, quantity = 1 } = await req.json()
-  const dbUser = await User.findById(user.userId)
+
+  const dbUser = await prisma.user.findUnique({ where: { id: user.userId } })
   if (!dbUser) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
-  const existing = dbUser.cart.find((c: { productId: { toString(): string }; quantity: number }) => c.productId.toString() === productId)
+  const cart = (dbUser.cart as any[]) || []
+  const existing = cart.find((c: any) => c.productId === productId)
   if (existing) {
     existing.quantity += quantity
   } else {
-    dbUser.cart.push({ productId, quantity, addedAt: new Date() })
+    cart.push({ productId, quantity, addedAt: new Date().toISOString() })
   }
-  await dbUser.save()
-  return NextResponse.json({ cart: dbUser.cart })
+
+  await prisma.user.update({ where: { id: user.userId }, data: { cart } })
+  return NextResponse.json({ cart })
 }
 
 export async function DELETE(req: NextRequest) {
   const user = getUser(req)
   if (!user?.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  await connectDB()
   const { productId } = await req.json()
-  const dbUser = await User.findById(user.userId)
+
+  const dbUser = await prisma.user.findUnique({ where: { id: user.userId } })
   if (!dbUser) return NextResponse.json({ error: 'User not found' }, { status: 404 })
-  dbUser.cart = dbUser.cart.filter((c) => c.productId.toString() !== productId)
-  await dbUser.save()
-  return NextResponse.json({ cart: dbUser.cart })
+
+  const cart = ((dbUser.cart as any[]) || []).filter((c: any) => c.productId !== productId)
+  await prisma.user.update({ where: { id: user.userId }, data: { cart } })
+  return NextResponse.json({ cart })
 }

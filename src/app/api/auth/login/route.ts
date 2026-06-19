@@ -1,21 +1,18 @@
 export const dynamic = "force-dynamic"
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
-import { connectDB } from '@/lib/db'
-import User from '@/lib/models/User'
+import { prisma } from '@/lib/db'
 import { signToken } from '@/lib/auth'
-import { headers } from 'next/headers'
 
 export async function POST(req: NextRequest) {
   try {
-    await connectDB()
     const { email, password } = await req.json()
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 })
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() })
+    const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } })
     if (!user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
@@ -29,24 +26,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
 
-    const headersList = headers()
-    const userAgent = headersList.get('user-agent') || 'Unknown'
+    const activity = (user.loginActivity as any[]) || []
+    activity.push({ date: new Date().toISOString(), device: 'web' })
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { loginActivity: activity.slice(-20) },
+    })
 
-    user.loginActivity.push({ date: new Date(), device: userAgent.substring(0, 100) })
-    if (user.loginActivity.length > 20) user.loginActivity = user.loginActivity.slice(-20)
-    await user.save()
-
-    const token = signToken({ userId: user._id.toString(), email: user.email, role: 'user' })
+    const token = signToken({ userId: user.id, email: user.email, role: 'user' })
 
     const response = NextResponse.json({
       success: true,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        profilePhoto: user.profilePhoto,
-      },
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, profilePhoto: user.profilePhoto },
     })
     response.cookies.set('auth_token', token, {
       httpOnly: true,
@@ -57,11 +48,7 @@ export async function POST(req: NextRequest) {
     })
     return response
   } catch (err: any) {
-    console.error('[LOGIN ERROR]', err?.message || err)
-    const msg = err?.message || 'Login failed'
-    if (msg.includes('MONGODB_URI') || msg.includes('connect') || msg.includes('ECONNREFUSED') || msg.includes('timed out') || msg.includes('authentication failed')) {
-      return NextResponse.json({ error: 'Database connection failed. Please contact support.' }, { status: 503 })
-    }
-    return NextResponse.json({ error: msg }, { status: 500 })
+    console.error('[LOGIN ERROR]', err?.message)
+    return NextResponse.json({ error: err?.message || 'Login failed' }, { status: 500 })
   }
 }

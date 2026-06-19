@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic"
 import { NextRequest, NextResponse } from 'next/server'
-import { connectDB } from '@/lib/db'
-import Content from '@/lib/models/Content'
+import { prisma } from '@/lib/db'
 import { verifyToken } from '@/lib/auth'
 
 function isAdmin(req: NextRequest) {
@@ -12,28 +11,34 @@ function isAdmin(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  await connectDB()
-  const { searchParams } = new URL(req.url)
-  const section = searchParams.get('section')
+  try {
+    const { searchParams } = new URL(req.url)
+    const section = searchParams.get('section')
 
-  if (section) {
-    const content = await Content.findOne({ section })
-    return NextResponse.json({ content })
+    if (section) {
+      const content = await prisma.content.findUnique({ where: { section } })
+      return NextResponse.json({ content })
+    }
+
+    const contents = await prisma.content.findMany()
+    return NextResponse.json({ contents })
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 })
   }
-
-  const contents = await Content.find()
-  return NextResponse.json({ contents })
 }
 
 export async function PUT(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  await connectDB()
-  const { section, title, subtitle, description, image, extraData } = await req.json()
+  try {
+    const { section, title, subtitle, description, image, extraData } = await req.json()
 
-  const content = await Content.findOneAndUpdate(
-    { section },
-    { title, subtitle, description, image, extraData },
-    { upsert: true, new: true }
-  )
-  return NextResponse.json({ content })
+    const content = await prisma.content.upsert({
+      where: { section },
+      update: { title: title || '', subtitle: subtitle || '', description: description || '', image: image || '', extraData },
+      create: { section, title: title || '', subtitle: subtitle || '', description: description || '', image: image || '', extraData },
+    })
+    return NextResponse.json({ content })
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 })
+  }
 }

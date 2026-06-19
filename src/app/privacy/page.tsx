@@ -14,7 +14,7 @@ export default function PrivacyPage() {
           <h2 className="text-xl font-bold text-gray-800 mt-6">How We Use Your Information</h2>
           <p>We use your information solely to process orders, send delivery updates, and provide customer support. We never sell your data to third parties.</p>
           <h2 className="text-xl font-bold text-gray-800 mt-6">Contact</h2>
-          <p>For privacy concerns, email us at info@karpefarm.com</p>
+          <p>For privacy concerns, email us at hivetech1010@gmail.com</p>
         </div>
       </div>
       <Footer />

@@ -16,7 +16,11 @@
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(cd \"g:\\\\karpefarm-main\" && mkdir -p public/photos && cp photos/*.jpeg public/photos/ && ls public/photos/)"
+    ],
+    "additionalDirectories": [
+      "G:\\karpefarm-main\\photos"
     ]
   }
 }

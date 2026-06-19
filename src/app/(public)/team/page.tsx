@@ -1,7 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import NatureBackground from '@/components/NatureBackground'
@@ -93,11 +92,9 @@ export default function TeamPage() {
                   {/* Profile Photo */}
                   <div className="flex justify-center -mt-16 relative z-10">
                     <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-xl bg-gray-100">
-                      <Image
+                      <img
                         src={member.image}
                         alt={member.name}
-                        width={112}
-                        height={112}
                         className="object-cover object-top w-full h-full"
                       />
                     </div>
@@ -123,7 +120,7 @@ export default function TeamPage() {
                     {/* Contact Buttons */}
                     <div className="flex gap-2 justify-center">
                       <a
-                        href="mailto:info@karpefarm.com"
+                        href="mailto:hivetech1010@gmail.com"
                         className="flex items-center gap-1.5 px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 text-xs font-semibold rounded-full transition-colors border border-green-100"
                       >
                         <FiMail size={13} /> Email
@@ -153,7 +150,7 @@ export default function TeamPage() {
               We are a small, passionate family. If you share our love for organic farming, we would love to connect.
             </p>
             <a
-              href="mailto:info@karpefarm.com"
+              href="mailto:hivetech1010@gmail.com"
               className="inline-flex items-center gap-2 px-8 py-3 bg-white text-green-700 font-bold rounded-full hover:bg-green-50 transition-all shadow-lg text-sm"
             >
               <FiMail size={16} /> Get In Touch

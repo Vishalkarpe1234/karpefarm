@@ -155,7 +155,7 @@ export default function HomePage() {
                 transition={{ duration: 0.6, delay: 0.5 }}
                 className="text-lg sm:text-xl text-gray-200 mb-8 max-w-2xl leading-relaxed"
               >
-                Bringing you the freshest organic produce from Takalibhan, Shrirampur, Maharashtra.
+                Bringing you the freshest organic produce from Kamalpur, Shrirampur, Maharashtra.
                 Grown with love, harvested with care — from our soil to your table.
               </motion.p>
 
@@ -297,8 +297,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Farm Videos Section */}
-      <section className="py-20 bg-earth">
+      {/* Farm Gallery Section */}
+      <section className="py-20 bg-gray-950">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -306,42 +306,76 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <span className="text-green-600 font-semibold text-sm uppercase tracking-wider">Farm Life</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-2 mb-4">From Our Farm</h2>
-            <p className="text-gray-500 max-w-xl mx-auto">Watch how we grow your food with love and care</p>
+            <span className="text-green-400 font-semibold text-sm uppercase tracking-wider">Real Farm Life</span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mt-2 mb-4">From Our Farm to Your Table</h2>
+            <p className="text-gray-400 max-w-xl mx-auto">
+              A glimpse into the heart of Karpe Farm — where every harvest tells a story of dedication, nature, and love.
+            </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Masonry-style gallery */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {[
-              { src: '/videos/corn.mp4', title: 'Our Corn Fields', desc: 'Fresh corn grown in our fertile Maharashtra soil' },
-              { src: '/videos/coconut.mp4', title: 'Coconut Harvest', desc: 'Tender coconuts freshly harvested from our groves' },
-            ].map((video, i) => (
+              { src: '/photos/coco-2.jpeg', label: 'Coconut Grove', span: 'row-span-2', desc: 'Our thriving coconut trees' },
+              { src: '/photos/m1.jpeg', label: 'Mosambi Oranges', span: '', desc: 'Fresh sweet lime harvest' },
+              { src: '/photos/mango.jpeg', label: 'Mango Harvest', span: '', desc: 'Hand-picked Alfonso mangoes' },
+              { src: '/photos/tomato.jpeg', label: 'Tomato Plants', span: '', desc: 'Organic tomato fields' },
+              { src: '/photos/onion.jpeg', label: 'Onion Packing', span: '', desc: 'Packed fresh at the farm' },
+              { src: '/photos/m2.jpeg', label: 'Mosambi Farm', span: '', desc: 'Citrus orchard in full bloom' },
+              { src: '/photos/eating goova.jpeg', label: 'Fresh Guava', span: 'col-span-2', desc: 'Farm-fresh guava — pure joy' },
+            ].map((photo, i) => (
               <motion.div
-                key={i}
-                initial={{ opacity: 0, x: i === 0 ? -30 : 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                key={photo.src}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                className="rounded-2xl overflow-hidden shadow-xl group"
+                transition={{ delay: i * 0.07 }}
+                whileHover={{ scale: 1.03 }}
+                className={`relative overflow-hidden rounded-2xl shadow-lg group cursor-pointer ${photo.span} ${
+                  i === 0 ? 'aspect-[3/4]' : photo.span === 'col-span-2' ? 'aspect-video' : 'aspect-square'
+                }`}
               >
-                <div className="relative aspect-video bg-gray-900">
-                  <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
-                  >
-                    <source src={video.src} type="video/mp4" />
-                  </video>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
-                    <h3 className="font-bold text-lg">{video.title}</h3>
-                    <p className="text-gray-300 text-sm mt-1">{video.desc}</p>
-                  </div>
+                <img
+                  src={photo.src}
+                  alt={photo.label}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                  <p className="text-white font-bold text-sm">{photo.label}</p>
+                  <p className="text-gray-300 text-xs mt-0.5">{photo.desc}</p>
+                </div>
+                <div className="absolute top-3 left-3">
+                  <span className="px-2 py-0.5 bg-green-500/90 text-white text-[10px] font-bold rounded-full uppercase tracking-wide backdrop-blur-sm">
+                    Karpe Farm
+                  </span>
                 </div>
               </motion.div>
             ))}
           </div>
+
+          {/* Bottom row — wide panoramic */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-4 relative overflow-hidden rounded-2xl shadow-xl group cursor-pointer"
+            style={{ height: '280px' }}
+          >
+            <img
+              src="/photos/tractor - coconuts view.jpeg"
+              alt="Karpe Farm coconut view"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/20 to-transparent" />
+            <div className="absolute left-0 top-0 bottom-0 flex items-center px-8">
+              <div>
+                <span className="text-green-400 text-xs font-bold uppercase tracking-widest block mb-2">Est. 2008</span>
+                <h3 className="text-white text-3xl font-extrabold mb-2">Karpe Farm, Kamalpur</h3>
+                <p className="text-gray-300 text-sm max-w-xs">50+ acres of pure organic farming in the heart of Maharashtra</p>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -392,7 +426,7 @@ export default function HomePage() {
                 A Legacy of <span className="text-green-600">Organic Farming</span>
               </h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Karpe Farm Agriculture has been nurturing the land in Takalibhan, Shrirampur, Maharashtra for over 15 years.
+                Karpe Farm Agriculture has been nurturing the land in Kamalpur, Shrirampur, Maharashtra for over 15 years.
                 Founded by Vinayak Vishwanath Karpe, our farm spans 50+ acres of fertile land where we grow the finest
                 vegetables, fruits, and organic produce.
               </p>

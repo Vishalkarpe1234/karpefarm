@@ -9,12 +9,12 @@ import { GiWheat, GiPlantSeed, GiOakLeaf, GiFarmTractor } from 'react-icons/gi'
 import { FiCheck, FiArrowRight, FiMapPin } from 'react-icons/fi'
 
 const milestones = [
-  { year: '2008', title: 'Farm Founded', desc: 'Vinayak Karpe established Karpe Farm on 10 acres of land in Nashik.' },
+  { year: '2008', title: 'Farm Founded', desc: 'Vinayak Karpe established Karpe Farm on our land in Kamalpur, Shrirampur, Maharashtra.' },
   { year: '2012', title: 'Organic Certification', desc: 'Achieved full organic certification after 4 years of natural farming.' },
   { year: '2016', title: 'Expansion', desc: 'Expanded to 50+ acres, adding coconut and mango orchards.' },
   { year: '2020', title: 'Modern Irrigation', desc: 'Installed drip irrigation systems across the entire farm.' },
-  { year: '2023', title: 'Direct Sales', desc: 'Launched direct farm-to-consumer sales model.' },
-  { year: '2025', title: 'Online Platform', desc: 'Launched Karpe Farm online for nationwide reach.' },
+  { year: '2022', title: 'Coconut Plantation', desc: 'Planted hundreds of coconut trees, now bearing fruit and symbolising our growth.' },
+  { year: '2025', title: 'Online Platform', desc: 'Launched Karpe Farm online platform for direct farm-to-consumer reach.' },
 ]
 
 const values = [
@@ -22,6 +22,13 @@ const values = [
   { icon: GiOakLeaf, title: 'Sustainability', desc: 'Every practice we follow is designed to protect our environment.' },
   { icon: GiFarmTractor, title: 'Innovation', desc: 'We combine traditional wisdom with modern farming technology.' },
   { icon: GiWheat, title: 'Community', desc: 'We support local farmers and contribute to our community.' },
+]
+
+const galleryPhotos = [
+  { src: '/photos/coco-1.jpeg', label: 'Coconut Planting 2022' },
+  { src: '/photos/front view cocnut.jpeg', label: 'Farm Front View 2020' },
+  { src: '/photos/mango.jpeg', label: 'Mango Harvest' },
+  { src: '/photos/m1.jpeg', label: 'Mosambi Orchard' },
 ]
 
 export default function AboutPage() {
@@ -57,12 +64,22 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="rounded-3xl overflow-hidden aspect-video">
-                <Image src="/images/farm-field.jpg" alt="Our Farm" fill className="object-cover" />
+              {/* Farm photo gallery collage */}
+              <div className="relative rounded-3xl overflow-hidden aspect-video shadow-2xl">
+                <img src="/photos/tractor - coconuts view.jpeg" alt="Karpe Farm" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-black/40 to-transparent" />
               </div>
-              <div className="absolute -bottom-6 -right-6 bg-white rounded-2xl shadow-xl p-5 max-w-48">
-                <div className="text-4xl font-extrabold text-green-600">15+</div>
-                <div className="text-sm text-gray-600 mt-1">Years of farming excellence</div>
+              <div className="absolute -bottom-4 -right-4 grid grid-cols-2 gap-2">
+                <div className="w-24 h-24 rounded-xl overflow-hidden shadow-lg border-2 border-white">
+                  <img src="/photos/coco-2.jpeg" alt="Coconut" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-24 h-24 rounded-xl overflow-hidden shadow-lg border-2 border-white">
+                  <img src="/photos/m1.jpeg" alt="Mosambi" className="w-full h-full object-cover" />
+                </div>
+              </div>
+              <div className="absolute -top-4 -left-4 bg-white rounded-2xl shadow-xl p-4">
+                <div className="text-3xl font-extrabold text-green-600">15+</div>
+                <div className="text-xs text-gray-600 mt-0.5">Years of farming</div>
               </div>
             </motion.div>
 
@@ -77,24 +94,24 @@ export default function AboutPage() {
               </h2>
               <p className="text-gray-600 leading-relaxed mb-4">
                 Karpe Farm Agriculture was born from a simple dream — to grow the purest, most nutritious food
-                using methods that respect the land. Founded by Vinayak Karpe in 2008 in the lush Nashik region
-                of Maharashtra, our farm began on just 10 acres.
+                using methods that respect the land. Founded by Vinayak Vishwanath Karpe in 2008 in the heart
+                of Kamalpur, Shrirampur, Maharashtra, our farm began on just 10 acres.
               </p>
               <p className="text-gray-600 leading-relaxed mb-4">
                 Over 15 years, guided by patience and dedication, we expanded to over 50 acres,
                 cultivating vegetables, fruits, and specialty crops using 100% organic practices.
-                Our farm is certified organic and follows traditional farming methods enhanced with
-                modern drip irrigation and soil management technology.
+                Our farm follows traditional farming methods enhanced with modern drip irrigation
+                and soil management technology.
               </p>
               <p className="text-gray-600 leading-relaxed mb-6">
                 Today, Karpe Farm serves hundreds of families across Maharashtra,
                 delivering farm-fresh produce that is as pure as nature intended.
               </p>
 
-              <div className="flex items-center gap-2 p-3 bg-green-50 rounded-xl mb-6">
-                <FiMapPin className="text-green-600 shrink-0" size={18} />
+              <div className="flex items-start gap-2 p-3 bg-green-50 rounded-xl mb-6">
+                <FiMapPin className="text-green-600 shrink-0 mt-0.5" size={16} />
                 <span className="text-sm text-gray-700">
-                  Karpe Patil House, Chandwad Road, Niphad, Nashik, Maharashtra 422303
+                  Karpe Farm House, Malwadgoan Road, Kamalpur, Takalibhan, Shrirampur 413725, Maharashtra, India
                 </span>
               </div>
 
@@ -102,6 +119,28 @@ export default function AboutPage() {
                 Shop Our Produce <FiArrowRight />
               </Link>
             </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Photo Gallery strip */}
+      <section className="py-10 bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {galleryPhotos.map((p) => (
+              <motion.div
+                key={p.src}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.04 }}
+                className="relative aspect-square rounded-xl overflow-hidden group"
+              >
+                <img src={p.src} alt={p.label} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <p className="absolute bottom-2 left-2 right-2 text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity">{p.label}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>

@@ -14,7 +14,7 @@ export default function TermsPage() {
           <h2 className="text-xl font-bold text-gray-800 mt-6">Orders</h2>
           <p>All orders are subject to availability. We reserve the right to cancel orders due to stock issues or delivery constraints.</p>
           <h2 className="text-xl font-bold text-gray-800 mt-6">Contact</h2>
-          <p>For questions, contact us at info@karpefarm.com</p>
+          <p>For questions, contact us at hivetech1010@gmail.com</p>
         </div>
       </div>
       <Footer />

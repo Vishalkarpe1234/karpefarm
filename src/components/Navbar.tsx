@@ -124,12 +124,12 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-0.5">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`nav-link-animated px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                className={`nav-link-animated px-2.5 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${
                   isActive(link.href)
                     ? 'text-green-700 bg-green-50'
                     : 'text-gray-600 hover:text-green-700 hover:bg-green-50'
@@ -235,7 +235,7 @@ export default function Navbar() {
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="lg:hidden p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+              className="md:hidden p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
             >
               {menuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
             </button>
@@ -250,7 +250,7 @@ export default function Navbar() {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.25 }}
-              className="lg:hidden border-t border-gray-100 overflow-hidden"
+              className="md:hidden border-t border-gray-100 overflow-hidden"
             >
               <div className="py-3 space-y-1">
                 {navLinks.map((link) => (
@@ -266,7 +266,7 @@ export default function Navbar() {
                   </Link>
                 ))}
                 {!user && (
-                  <div className="flex gap-2 px-2 pt-2 pb-1">
+                  <div className="flex gap-2 px-2 pt-2 pb-1 md:hidden">
                     <Link href="/auth/login" onClick={() => setMenuOpen(false)} className="flex-1 text-center px-4 py-2 text-sm font-medium text-green-700 border border-green-300 rounded-full hover:bg-green-50 transition-colors">
                       Login
                     </Link>

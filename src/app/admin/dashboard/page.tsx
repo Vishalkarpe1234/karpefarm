@@ -109,7 +109,7 @@ const DEFAULT_CONTACT: ContactInfo = {
   address: 'Karpe Farm House, Malwadgoan Road, Kamalpur, Takalibhan, Shrirampur 413725, Maharashtra, India',
   phone1: '9637494175',
   phone2: '9130931719',
-  email: 'info@karpefarm.com',
+  email: 'hivetech1010@gmail.com',
   hoursWeekday: 'Mon - Sat: 6:00 AM - 7:00 PM',
   hoursSunday: 'Sunday: 7:00 AM - 2:00 PM',
 }
@@ -339,14 +339,14 @@ function AdminDashboardContent() {
     try {
       await axios.put('/api/admin/content', { section: 'home', title: homeContent.title, subtitle: homeContent.subtitle, description: homeContent.description })
       toast.success('Home content saved!')
-    } catch { toast.error('Failed to save') }
+    } catch (err: any) { toast.error(err.response?.data?.error || err.message || 'Save failed — check MongoDB connection') }
   }
 
   async function saveAboutContent() {
     try {
       await axios.put('/api/admin/content', { section: 'about', title: aboutContent.title, description: aboutContent.description, extraData: { story: aboutContent.story } })
       toast.success('About content saved!')
-    } catch { toast.error('Failed to save') }
+    } catch (err: any) { toast.error(err.response?.data?.error || err.message || 'Save failed — check MongoDB connection') }
   }
 
   async function saveServices() {
@@ -354,7 +354,7 @@ function AdminDashboardContent() {
       await axios.put('/api/admin/content', { section: 'services', extraData: { services: dbServices } })
       toast.success('Services saved!')
       setEditService(null)
-    } catch { toast.error('Failed to save services') }
+    } catch (err: any) { toast.error(err.response?.data?.error || err.message || 'Save failed — check MongoDB connection') }
   }
 
   async function saveTeam() {
@@ -363,14 +363,23 @@ function AdminDashboardContent() {
       toast.success('Team saved!')
       setEditMember(null)
       setShowAddMember(false)
-    } catch { toast.error('Failed to save team') }
+    } catch (err: any) { toast.error(err.response?.data?.error || err.message || 'Save failed — check MongoDB connection') }
   }
 
   async function saveContactInfo() {
     try {
       await axios.put('/api/admin/content', { section: 'contact-info', extraData: contactInfo })
       toast.success('Contact info saved!')
-    } catch { toast.error('Failed to save contact info') }
+    } catch (err: any) { toast.error(err.response?.data?.error || err.message || 'Save failed — check MongoDB connection in Vercel') }
+  }
+
+  function handleTeamPhotoUpload(e: React.ChangeEvent<HTMLInputElement>, onSet: (url: string) => void) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) { toast.error('Photo must be under 2MB'); return }
+    const reader = new FileReader()
+    reader.onload = () => onSet(reader.result as string)
+    reader.readAsDataURL(file)
   }
 
   function addTeamMember() {
@@ -1030,9 +1039,22 @@ function AdminDashboardContent() {
                               </div>
                               <div>
                                 <label className={labelCls}>Photo</label>
-                                <select value={editMember.image} onChange={e => setEditMember({ ...editMember, image: e.target.value })} className={inputCls}>
-                                  {TEAM_IMAGES.map(img => <option key={img} value={img}>{img}</option>)}
-                                </select>
+                                <div className="flex items-center gap-3">
+                                  {editMember.image && (
+                                    <img src={editMember.image} alt="preview" className="w-12 h-12 rounded-full object-cover border-2 border-gray-600" />
+                                  )}
+                                  <div className="flex-1 space-y-2">
+                                    <label className="flex items-center gap-2 px-3 py-2 bg-gray-800 border border-dashed border-gray-600 rounded-xl cursor-pointer hover:border-green-500 transition-colors">
+                                      <FiCamera size={14} className="text-gray-400" />
+                                      <span className="text-gray-400 text-xs">Upload Photo (max 2MB)</span>
+                                      <input type="file" accept="image/*" className="hidden" onChange={e => handleTeamPhotoUpload(e, url => setEditMember({ ...editMember, image: url }))} />
+                                    </label>
+                                    <select value={editMember.image.startsWith('data:') ? '' : editMember.image} onChange={e => { if (e.target.value) setEditMember({ ...editMember, image: e.target.value }) }} className={inputCls}>
+                                      <option value="">— or choose existing —</option>
+                                      {TEAM_IMAGES.map(img => <option key={img} value={img}>{img}</option>)}
+                                    </select>
+                                  </div>
+                                </div>
                               </div>
                               <div className="flex gap-2">
                                 <button onClick={() => { setTeamMembers(teamMembers.map(x => x.id === m.id ? editMember : x)); setEditMember(null) }} className="flex-1 py-2 bg-green-600 text-white rounded-xl text-xs font-bold hover:bg-green-500">Apply</button>
@@ -1042,7 +1064,7 @@ function AdminDashboardContent() {
                           ) : (
                             <div className="flex items-start gap-3">
                               <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-gray-700">
-                                <Image src={m.image} alt={m.name} width={48} height={48} className="object-cover object-top w-full h-full" />
+                                <img src={m.image} alt={m.name} className="object-cover object-top w-full h-full" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-white font-bold text-sm">{m.name}</p>
@@ -1083,9 +1105,22 @@ function AdminDashboardContent() {
                             </div>
                             <div>
                               <label className={labelCls}>Photo</label>
-                              <select value={newMember.image} onChange={e => setNewMember({ ...newMember, image: e.target.value })} className={inputCls}>
-                                {TEAM_IMAGES.map(img => <option key={img} value={img}>{img}</option>)}
-                              </select>
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-3">
+                                  {newMember.image && (
+                                    <img src={newMember.image} alt="preview" className="w-12 h-12 rounded-full object-cover border-2 border-gray-600 shrink-0" />
+                                  )}
+                                  <label className="flex-1 flex items-center gap-2 px-3 py-2.5 bg-gray-800 border border-dashed border-gray-600 rounded-xl cursor-pointer hover:border-green-500 transition-colors">
+                                    <FiCamera size={14} className="text-gray-400" />
+                                    <span className="text-gray-400 text-xs">Upload Photo (max 2MB)</span>
+                                    <input type="file" accept="image/*" className="hidden" onChange={e => handleTeamPhotoUpload(e, url => setNewMember({ ...newMember, image: url }))} />
+                                  </label>
+                                </div>
+                                <select value={newMember.image.startsWith('data:') ? '' : newMember.image} onChange={e => { if (e.target.value) setNewMember({ ...newMember, image: e.target.value }) }} className={inputCls}>
+                                  <option value="">— or choose existing photo —</option>
+                                  {TEAM_IMAGES.map(img => <option key={img} value={img}>{img}</option>)}
+                                </select>
+                              </div>
                             </div>
                             <div className="flex gap-3 pt-2">
                               <button onClick={addTeamMember} className="flex-1 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-500">Add Member</button>

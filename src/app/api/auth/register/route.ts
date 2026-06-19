@@ -42,8 +42,12 @@ export async function POST(req: NextRequest) {
       path: '/',
     })
     return response
-  } catch (err) {
-    console.error(err)
-    return NextResponse.json({ error: 'Registration failed' }, { status: 500 })
+  } catch (err: any) {
+    console.error('[REGISTER ERROR]', err?.message || err)
+    const msg = err?.message || 'Registration failed'
+    if (msg.includes('MONGODB_URI') || msg.includes('connect') || msg.includes('ECONNREFUSED') || msg.includes('timed out') || msg.includes('authentication failed')) {
+      return NextResponse.json({ error: 'Database connection failed. Please contact support.' }, { status: 503 })
+    }
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 }

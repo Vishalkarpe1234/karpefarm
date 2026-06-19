@@ -27,6 +27,23 @@ async function seedProducts() {
   const count = await Product.countDocuments()
   if (count === 0) {
     await Product.insertMany(defaultProducts)
+    return
+  }
+  // Migrate old /images/ paths to /photos/ and update descriptions
+  const migrations = [
+    { name: 'Fresh Onions', image: '/photos/onion.jpeg', description: 'Organically grown red onions from our Kamalpur farm, packed fresh in jute bags. Rich in antioxidants and sulfur compounds that support immunity.', isFeatured: true },
+    { name: 'Fresh Tomatoes', image: '/photos/tomato.jpeg', description: 'Juicy, firm tomatoes grown with natural compost on our farm. No harmful chemicals — just sun, soil, and care.', isFeatured: true },
+    { name: 'Mosambi (Sweet Lime)', image: '/photos/m1.jpeg', description: 'Vitamin C-rich mosambi grown in our orchard at Kamalpur. Planted in 2022, these sweet limes are tender, juicy, and full of natural flavor.', isFeatured: true },
+    { name: 'Fresh Coconuts', image: '/photos/coco-2.jpeg', description: 'Tender coconuts freshly harvested from our coconut grove. Planted in 2022 and now yielding fresh, nutritious coconuts full of natural water and pulp.', isFeatured: true },
+    { name: 'Alphonso Mango', image: '/photos/mango.jpeg', description: 'Premium mangoes hand-picked from our orchard at peak ripeness. Sweet, aromatic, and bursting with flavor — from our farm directly to you.', isFeatured: true },
+  ]
+  for (const m of migrations) {
+    await Product.updateOne({ name: m.name }, { $set: { image: m.image, description: m.description, isFeatured: m.isFeatured } })
+  }
+  // Add Guava if missing
+  const guavaExists = await Product.findOne({ name: 'Fresh Guava (Peru)' })
+  if (!guavaExists) {
+    await Product.create({ name: 'Fresh Guava (Peru)', description: 'Farm-fresh guava picked at natural ripeness. Crunchy outside, soft inside — rich in Vitamin C and a favorite at our farm. Enjoyed fresh, straight from the tree.', price: 35, unit: 'kg', image: '/photos/eating goova.jpeg', category: 'fruit', stock: 100, rating: 4.6, reviews: 80, isFeatured: true, isActive: true })
   }
 }
 

@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import {
-  FiMenu, FiX, FiShoppingCart, FiBell, FiUser, FiLogOut, FiSettings, FiPackage, FiHome, FiGrid,
+  FiShoppingCart, FiBell, FiLogOut, FiSettings, FiPackage, FiGrid,
 } from 'react-icons/fi'
 import { GiWheat } from 'react-icons/gi'
 
@@ -20,7 +20,6 @@ interface User {
 }
 
 export default function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const [scrolled, setScrolled] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
@@ -232,53 +231,37 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Mobile menu toggle */}
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
-            >
-              {menuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-            </button>
-          </div>
+            </div>
         </div>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.25 }}
-              className="md:hidden border-t border-gray-100 overflow-hidden"
-            >
-              <div className="py-3 space-y-1">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setMenuOpen(false)}
-                    className={`block px-4 py-2.5 text-sm font-medium rounded-lg mx-2 transition-colors ${
-                      isActive(link.href) ? 'text-green-700 bg-green-50' : 'text-gray-700 hover:bg-green-50 hover:text-green-700'
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-                {!user && (
-                  <div className="flex gap-2 px-2 pt-2 pb-1 md:hidden">
-                    <Link href="/auth/login" onClick={() => setMenuOpen(false)} className="flex-1 text-center px-4 py-2 text-sm font-medium text-green-700 border border-green-300 rounded-full hover:bg-green-50 transition-colors">
-                      Login
-                    </Link>
-                    <Link href="/auth/register" onClick={() => setMenuOpen(false)} className="flex-1 text-center px-4 py-2 text-sm font-semibold text-white bg-green-600 rounded-full hover:bg-green-700 transition-colors">
-                      Register
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Mobile horizontal scrollable nav — always visible */}
+        <div className="md:hidden border-t border-gray-100 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+          <div className="flex items-center gap-1 px-2 py-2" style={{ width: 'max-content', minWidth: '100%' }}>
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition-all ${
+                  isActive(link.href)
+                    ? 'bg-green-600 text-white shadow-sm'
+                    : 'text-gray-600 bg-gray-100 hover:bg-green-50 hover:text-green-700'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            {!user && (
+              <>
+                <Link href="/auth/login" className="px-3 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap text-green-700 border border-green-300 bg-white hover:bg-green-50 transition-all">
+                  Login
+                </Link>
+                <Link href="/auth/register" className="px-3 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap text-white bg-green-600 hover:bg-green-700 transition-all">
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </motion.nav>
   )

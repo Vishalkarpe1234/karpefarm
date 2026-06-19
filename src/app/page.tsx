@@ -155,7 +155,7 @@ export default function HomePage() {
                 transition={{ duration: 0.6, delay: 0.5 }}
                 className="text-lg sm:text-xl text-gray-200 mb-8 max-w-2xl leading-relaxed"
               >
-                Bringing you the freshest organic produce from the heart of Nashik.
+                Bringing you the freshest organic produce from Takalibhan, Shrirampur, Maharashtra.
                 Grown with love, harvested with care — from our soil to your table.
               </motion.p>
 
@@ -346,7 +346,7 @@ export default function HomePage() {
       </section>
 
       {/* About Preview */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -355,20 +355,31 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="relative rounded-3xl overflow-hidden aspect-square max-w-lg">
-                <Image src="/images/farm-field.jpg" alt="Karpe Farm" fill className="object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-transparent" />
+              {/* Nature illustration instead of machinery image */}
+              <div className="relative rounded-3xl overflow-hidden aspect-square max-w-lg bg-gradient-to-br from-green-100 via-emerald-50 to-teal-100 flex items-center justify-center shadow-xl">
+                <div className="absolute inset-0 opacity-20 text-6xl select-none pointer-events-none flex flex-wrap content-start p-4 gap-2 overflow-hidden">
+                  {'🌿🌾🍃🌱🌻🍀🥬🥭🧅🥥🍋🌽'.split('').map((e, i) => (
+                    <span key={i}>{e}</span>
+                  ))}
+                </div>
+                <div className="relative z-10 text-center p-8">
+                  <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-2xl mx-auto mb-4">
+                    <Image src="/images/logo.png" alt="Karpe Farm" width={160} height={160} className="object-cover w-full h-full" />
+                  </div>
+                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg">
+                    <p className="text-green-800 font-bold text-xl">Karpe Farm</p>
+                    <p className="text-green-600 text-sm">Kamalpur, Shrirampur</p>
+                    <p className="text-gray-500 text-xs mt-1">Maharashtra, India 413725</p>
+                  </div>
+                </div>
               </div>
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 3, repeat: Infinity }}
-                className="absolute -bottom-4 -right-4 w-40 h-40 rounded-2xl overflow-hidden shadow-xl border-4 border-white"
+                className="absolute -bottom-4 -right-4 w-24 h-24 bg-green-100 rounded-full flex items-center justify-center shadow-lg border-4 border-white"
               >
-                <Image src="/images/logo-farm.jpeg" alt="Farm Logo" fill className="object-cover" />
-              </motion.div>
-              <div className="absolute -top-4 -left-4 w-24 h-24 bg-green-100 rounded-full flex items-center justify-center shadow-lg animate-float">
                 <GiWheat className="text-green-600" size={36} />
-              </div>
+              </motion.div>
             </motion.div>
 
             <motion.div
@@ -381,12 +392,12 @@ export default function HomePage() {
                 A Legacy of <span className="text-green-600">Organic Farming</span>
               </h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Karpe Farm Agriculture has been nurturing the land in the heart of Nashik, Maharashtra for over 15 years.
-                Founded by Vinayak Karpe, our farm spans 50+ acres of fertile land where we grow the finest
+                Karpe Farm Agriculture has been nurturing the land in Takalibhan, Shrirampur, Maharashtra for over 15 years.
+                Founded by Vinayak Vishwanath Karpe, our farm spans 50+ acres of fertile land where we grow the finest
                 vegetables, fruits, and organic produce.
               </p>
               <p className="text-gray-600 leading-relaxed mb-6">
-                Located in the serene region of Chandwad, our farm blends traditional farming wisdom with
+                Located in the heart of Kamalpur on Malwadgoan Road, our farm blends traditional farming wisdom with
                 modern agricultural techniques to bring you produce that is not just fresh, but alive with
                 nutrients and flavor.
               </p>

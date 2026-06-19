@@ -7,7 +7,8 @@ import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 
 interface Product {
-  _id: string
+  id: string
+  _id?: string
   name: string
   description: string
   price: number
@@ -38,7 +39,7 @@ export default function ProductCard({ product, isLoggedIn, onBuyClick }: Props) 
     }
     setAddingCart(true)
     try {
-      await axios.post('/api/cart', { productId: product._id, quantity: 1 })
+      await axios.post('/api/cart', { productId: product.id || product._id, quantity: 1 })
       toast.success(`${product.name} added to cart!`)
     } catch {
       toast.error('Failed to add to cart')

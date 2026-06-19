@@ -15,7 +15,8 @@ import {
 import { GiWheat, GiPlantSeed, GiTreehouse, GiSunflower, GiWateringCan, GiOakLeaf } from 'react-icons/gi'
 
 interface Product {
-  _id: string
+  id: string
+  _id?: string
   name: string
   description: string
   price: number
@@ -89,6 +90,7 @@ export default function HomePage() {
               muted
               loop
               playsInline
+              preload="none"
               onError={() => setVideoError(true)}
               className="w-full h-full object-cover"
             >
@@ -107,23 +109,8 @@ export default function HomePage() {
           <div className="hero-overlay absolute inset-0" />
         </motion.div>
 
-        {/* Floating nature elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          {['🌿', '🌾', '🍃', '🌱', '🌻'].map((emoji, i) => (
-            <motion.span
-              key={i}
-              className="absolute text-2xl select-none"
-              style={{ left: `${10 + i * 18}%`, top: `${20 + (i % 3) * 15}%` }}
-              animate={{ y: [0, -15, 0], rotate: [0, 10, -10, 0], opacity: [0.4, 0.7, 0.4] }}
-              transition={{ duration: 3 + i, repeat: Infinity, delay: i * 0.5 }}
-            >
-              {emoji}
-            </motion.span>
-          ))}
-        </div>
-
         {/* Hero Content */}
-        <div className="relative z-10 h-full flex items-center">
+        <div className="relative z-10 h-full flex items-center pt-28 md:pt-0">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <div className="max-w-3xl">
               <motion.div
@@ -141,7 +128,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.3 }}
-                className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white leading-tight mb-6"
+                className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white leading-tight mb-6"
               >
                 Karpe Farm
                 <span className="block text-gradient-green bg-gradient-to-r from-green-300 to-emerald-400 bg-clip-text text-transparent">
@@ -153,7 +140,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.5 }}
-                className="text-lg sm:text-xl text-gray-200 mb-8 max-w-2xl leading-relaxed"
+                className="text-base sm:text-xl text-gray-200 mb-8 max-w-2xl leading-relaxed"
               >
                 Bringing you the freshest organic produce from Kamalpur, Shrirampur, Maharashtra.
                 Grown with love, harvested with care — from our soil to your table.
@@ -286,7 +273,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {products.map((product) => (
                 <ProductCard
-                  key={product._id}
+                  key={product.id}
                   product={product}
                   isLoggedIn={isLoggedIn}
                   onBuyClick={setBuyProduct}
@@ -306,10 +293,10 @@ export default function HomePage() {
               initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="relative"
+              className="relative pb-6 sm:pb-10"
             >
               {/* Main photo - mosambi orchard */}
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{ height: '380px' }}>
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{ height: '340px' }}>
                 <img src="/photos/m1.jpeg" alt="Mosambi Orchard" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                 <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-xl px-3 py-2 shadow">
@@ -317,18 +304,18 @@ export default function HomePage() {
                   <p className="text-gray-500 text-xs">Planted 2022 · Photo 2024</p>
                 </div>
               </div>
-              {/* Coconut planting overlay */}
-              <div className="absolute -bottom-5 -right-4 w-36 h-36 rounded-2xl overflow-hidden border-4 border-white shadow-xl">
+              {/* Coconut planting overlay — right-aligned, safe on mobile */}
+              <div className="absolute bottom-0 right-0 sm:-bottom-5 sm:-right-4 w-28 h-28 sm:w-36 sm:h-36 rounded-2xl overflow-hidden border-4 border-white shadow-xl">
                 <img src="/photos/coco-1.jpeg" alt="Coconut Plantation 2022" className="w-full h-full object-cover" />
               </div>
               {/* Floating badge */}
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 3, repeat: Infinity }}
-                className="absolute -bottom-4 -left-3 w-20 h-20 bg-green-600 rounded-full flex flex-col items-center justify-center shadow-lg border-4 border-white"
+                className="absolute bottom-0 left-2 sm:-bottom-4 sm:-left-3 w-16 h-16 sm:w-20 sm:h-20 bg-green-600 rounded-full flex flex-col items-center justify-center shadow-lg border-4 border-white"
               >
-                <GiWheat className="text-white" size={22} />
-                <span className="text-white text-[10px] font-bold mt-0.5">Since 1999</span>
+                <GiWheat className="text-white" size={18} />
+                <span className="text-white text-[9px] sm:text-[10px] font-bold mt-0.5">Since 1999</span>
               </motion.div>
             </motion.div>
 

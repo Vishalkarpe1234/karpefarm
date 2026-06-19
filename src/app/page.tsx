@@ -70,7 +70,7 @@ export default function HomePage() {
   const stats = [
     { value: '15+', label: 'Years of Farming', icon: GiOakLeaf },
     { value: '500+', label: 'Happy Customers', icon: FiStar },
-    { value: '50+', label: 'Acres Cultivated', icon: GiWheat },
+    { value: '30+', label: 'Crop Varieties', icon: GiWheat },
     { value: '100%', label: 'Organic Certified', icon: GiPlantSeed },
   ]
 
@@ -313,16 +313,15 @@ export default function HomePage() {
             </p>
           </motion.div>
 
-          {/* Masonry-style gallery */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+          {/* Gallery — 3 columns, 2 rows, clean no-gap grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             {[
-              { src: '/photos/coco-2.jpeg', label: 'Coconut Grove', span: 'row-span-2', desc: 'Our thriving coconut trees' },
-              { src: '/photos/m1.jpeg', label: 'Mosambi Oranges', span: '', desc: 'Fresh sweet lime harvest' },
-              { src: '/photos/mango.jpeg', label: 'Mango Harvest', span: '', desc: 'Hand-picked Alfonso mangoes' },
-              { src: '/photos/tomato.jpeg', label: 'Tomato Plants', span: '', desc: 'Organic tomato fields' },
-              { src: '/photos/onion.jpeg', label: 'Onion Packing', span: '', desc: 'Packed fresh at the farm' },
-              { src: '/photos/m2.jpeg', label: 'Mosambi Farm', span: '', desc: 'Citrus orchard in full bloom' },
-              { src: '/photos/eating goova.jpeg', label: 'Fresh Guava', span: 'col-span-2', desc: 'Farm-fresh guava — pure joy' },
+              { src: '/photos/coco-2.jpeg', label: 'Coconut Grove', desc: 'Our thriving coconut trees' },
+              { src: '/photos/m1.jpeg', label: 'Mosambi Orchard', desc: 'Sweet lime — planted 2022, photo 2024' },
+              { src: '/photos/mango.jpeg', label: 'Mango Harvest', desc: 'Fresh mangoes from our orchard' },
+              { src: '/photos/onion.jpeg', label: 'Onion Packing', desc: 'Packed fresh at the farm' },
+              { src: '/photos/tomato.jpeg', label: 'Tomato Plants', desc: 'Organic tomato fields' },
+              { src: '/photos/eating goova.jpeg', label: 'Fresh Guava', desc: 'Farm-fresh guava — pure joy' },
             ].map((photo, i) => (
               <motion.div
                 key={photo.src}
@@ -331,9 +330,7 @@ export default function HomePage() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.07 }}
                 whileHover={{ scale: 1.03 }}
-                className={`relative overflow-hidden rounded-2xl shadow-lg group cursor-pointer ${photo.span} ${
-                  i === 0 ? 'aspect-[3/4]' : photo.span === 'col-span-2' ? 'aspect-video' : 'aspect-square'
-                }`}
+                className="relative overflow-hidden rounded-2xl shadow-lg group cursor-pointer aspect-square"
               >
                 <img
                   src={photo.src}
@@ -372,7 +369,7 @@ export default function HomePage() {
               <div>
                 <span className="text-green-400 text-xs font-bold uppercase tracking-widest block mb-2">Est. 2008</span>
                 <h3 className="text-white text-3xl font-extrabold mb-2">Karpe Farm, Kamalpur</h3>
-                <p className="text-gray-300 text-sm max-w-xs">50+ acres of pure organic farming in the heart of Maharashtra</p>
+                <p className="text-gray-300 text-sm max-w-xs">Pure organic farming in the heart of Maharashtra</p>
               </div>
             </div>
           </motion.div>
@@ -389,30 +386,27 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="relative"
             >
-              {/* Nature illustration instead of machinery image */}
-              <div className="relative rounded-3xl overflow-hidden aspect-square max-w-lg bg-gradient-to-br from-green-100 via-emerald-50 to-teal-100 flex items-center justify-center shadow-xl">
-                <div className="absolute inset-0 opacity-20 text-6xl select-none pointer-events-none flex flex-wrap content-start p-4 gap-2 overflow-hidden">
-                  {'🌿🌾🍃🌱🌻🍀🥬🥭🧅🥥🍋🌽'.split('').map((e, i) => (
-                    <span key={i}>{e}</span>
-                  ))}
-                </div>
-                <div className="relative z-10 text-center p-8">
-                  <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-2xl mx-auto mb-4">
-                    <Image src="/images/logo.png" alt="Karpe Farm" width={160} height={160} className="object-cover w-full h-full" />
-                  </div>
-                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg">
-                    <p className="text-green-800 font-bold text-xl">Karpe Farm</p>
-                    <p className="text-green-600 text-sm">Kamalpur, Shrirampur</p>
-                    <p className="text-gray-500 text-xs mt-1">Maharashtra, India 413725</p>
-                  </div>
+              {/* Main photo - mosambi orchard */}
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{ height: '380px' }}>
+                <img src="/photos/m1.jpeg" alt="Mosambi Orchard" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-xl px-3 py-2 shadow">
+                  <p className="text-green-700 font-bold text-sm">Mosambi Orchard</p>
+                  <p className="text-gray-500 text-xs">Planted 2022 · Photo 2024</p>
                 </div>
               </div>
+              {/* Coconut planting overlay */}
+              <div className="absolute -bottom-5 -right-4 w-36 h-36 rounded-2xl overflow-hidden border-4 border-white shadow-xl">
+                <img src="/photos/coco-1.jpeg" alt="Coconut Plantation 2022" className="w-full h-full object-cover" />
+              </div>
+              {/* Floating badge */}
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 3, repeat: Infinity }}
-                className="absolute -bottom-4 -right-4 w-24 h-24 bg-green-100 rounded-full flex items-center justify-center shadow-lg border-4 border-white"
+                className="absolute -bottom-4 -left-3 w-20 h-20 bg-green-600 rounded-full flex flex-col items-center justify-center shadow-lg border-4 border-white"
               >
-                <GiWheat className="text-green-600" size={36} />
+                <GiWheat className="text-white" size={22} />
+                <span className="text-white text-[10px] font-bold mt-0.5">Est 2008</span>
               </motion.div>
             </motion.div>
 
@@ -427,8 +421,8 @@ export default function HomePage() {
               </h2>
               <p className="text-gray-600 leading-relaxed mb-4">
                 Karpe Farm Agriculture has been nurturing the land in Kamalpur, Shrirampur, Maharashtra for over 15 years.
-                Founded by Vinayak Vishwanath Karpe, our farm spans 50+ acres of fertile land where we grow the finest
-                vegetables, fruits, and organic produce.
+                Founded by Vinayak Vishwanath Karpe, our farm grows the finest vegetables, fruits, and organic produce
+                on fertile farmland.
               </p>
               <p className="text-gray-600 leading-relaxed mb-6">
                 Located in the heart of Kamalpur on Malwadgoan Road, our farm blends traditional farming wisdom with

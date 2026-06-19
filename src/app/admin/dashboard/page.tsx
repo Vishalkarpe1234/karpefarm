@@ -170,8 +170,11 @@ function AdminDashboardContent() {
 
   // Content management
   const [contentTab, setContentTab] = useState('home')
-  const [homeContent, setHomeContent] = useState({ title: 'Karpe Farm Agriculture', subtitle: 'Bringing you the freshest organic produce from Takalibhan, Shrirampur, Maharashtra.', description: '' })
-  const [aboutContent, setAboutContent] = useState({ title: 'A Legacy of Organic Farming', description: 'Karpe Farm Agriculture has been nurturing the land in Takalibhan, Shrirampur, Maharashtra for over 15 years.', story: '' })
+  const [homeContent, setHomeContent] = useState({ title: 'Karpe Farm Agriculture', subtitle: 'Bringing you the freshest organic produce from Kamalpur, Shrirampur, Maharashtra.', description: '' })
+  const [aboutContent, setAboutContent] = useState({ title: 'A Legacy of Organic Farming', description: 'Karpe Farm Agriculture was born from a simple dream — to grow the purest, most nutritious food using methods that respect the land.', story: '' })
+  const [aboutImages, setAboutImages] = useState<Array<{ url: string; caption: string }>>([])
+  const [newAboutImgUrl, setNewAboutImgUrl] = useState('')
+  const [newAboutImgCaption, setNewAboutImgCaption] = useState('')
   const [dbServices, setDbServices] = useState<ServiceItem[]>(DEFAULT_SERVICES)
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(DEFAULT_TEAM)
   const [contactInfo, setContactInfo] = useState<ContactInfo>(DEFAULT_CONTACT)
@@ -220,7 +223,10 @@ function AdminDashboardContent() {
       const contents: Array<{ section: string; title?: string; subtitle?: string; description?: string; extraData?: Record<string, unknown> }> = r.data.contents || []
       contents.forEach((c) => {
         if (c.section === 'home') setHomeContent({ title: c.title || homeContent.title, subtitle: c.subtitle || homeContent.subtitle, description: c.description || '' })
-        if (c.section === 'about') setAboutContent({ title: c.title || aboutContent.title, description: c.description || aboutContent.description, story: (c.extraData?.story as string) || '' })
+        if (c.section === 'about') {
+          setAboutContent({ title: c.title || aboutContent.title, description: c.description || aboutContent.description, story: (c.extraData?.story as string) || '' })
+          if (c.extraData?.images) setAboutImages(c.extraData.images as Array<{ url: string; caption: string }>)
+        }
         if (c.section === 'services' && c.extraData?.services) setDbServices(c.extraData.services as ServiceItem[])
         if (c.section === 'team' && c.extraData?.members) setTeamMembers(c.extraData.members as TeamMember[])
         if (c.section === 'contact-info' && c.extraData) setContactInfo({ ...DEFAULT_CONTACT, ...(c.extraData as ContactInfo) })
@@ -344,9 +350,25 @@ function AdminDashboardContent() {
 
   async function saveAboutContent() {
     try {
-      await axios.put('/api/admin/content', { section: 'about', title: aboutContent.title, description: aboutContent.description, extraData: { story: aboutContent.story } })
+      await axios.put('/api/admin/content', { section: 'about', title: aboutContent.title, description: aboutContent.description, extraData: { story: aboutContent.story, images: aboutImages } })
       toast.success('About content saved!')
     } catch (err: any) { toast.error(err.response?.data?.error || err.message || 'Save failed — check MongoDB connection') }
+  }
+
+  function addAboutImage() {
+    if (!newAboutImgUrl) { toast.error('Enter an image URL or upload a photo'); return }
+    setAboutImages([...aboutImages, { url: newAboutImgUrl, caption: newAboutImgCaption }])
+    setNewAboutImgUrl('')
+    setNewAboutImgCaption('')
+  }
+
+  function handleAboutImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 3 * 1024 * 1024) { toast.error('Image must be under 3MB'); return }
+    const reader = new FileReader()
+    reader.onload = () => setNewAboutImgUrl(reader.result as string)
+    reader.readAsDataURL(file)
   }
 
   async function saveServices() {
@@ -997,8 +1019,44 @@ function AdminDashboardContent() {
                       <label className={labelCls}>Our Story (detailed paragraph)</label>
                       <textarea value={aboutContent.story} onChange={e => setAboutContent(c => ({ ...c, story: e.target.value }))} rows={5} className={textareaCls} />
                     </div>
+
+                    {/* Image Gallery Management */}
+                    <div className="border border-gray-700 rounded-xl p-4 space-y-3">
+                      <h4 className="text-white font-semibold text-sm">About Page Photos</h4>
+                      {/* Existing images */}
+                      {aboutImages.length > 0 && (
+                        <div className="grid grid-cols-3 gap-2 mb-3">
+                          {aboutImages.map((img, i) => (
+                            <div key={i} className="relative">
+                              <img src={img.url} alt={img.caption} className="w-full h-20 object-cover rounded-lg" />
+                              <p className="text-gray-400 text-[10px] mt-1 truncate">{img.caption}</p>
+                              <button onClick={() => setAboutImages(aboutImages.filter((_, j) => j !== i))} className="absolute top-1 right-1 w-5 h-5 bg-red-600 text-white rounded-full flex items-center justify-center text-[10px]">×</button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {/* Add new image */}
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <label className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 border border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-green-500 text-xs text-gray-400">
+                            <FiCamera size={12} /> Upload Photo
+                            <input type="file" accept="image/*" className="hidden" onChange={handleAboutImageUpload} />
+                          </label>
+                          <span className="text-gray-500 text-xs">or paste URL below</span>
+                        </div>
+                        {newAboutImgUrl && (
+                          <img src={newAboutImgUrl} alt="preview" className="h-20 rounded-lg object-cover" />
+                        )}
+                        <input type="text" value={newAboutImgUrl} onChange={e => setNewAboutImgUrl(e.target.value)} placeholder="Image URL (or upload above)" className={inputCls} />
+                        <input type="text" value={newAboutImgCaption} onChange={e => setNewAboutImgCaption(e.target.value)} placeholder="Caption (e.g. Coconut Planting 2022)" className={inputCls} />
+                        <button onClick={addAboutImage} className="px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold rounded-xl transition-colors">
+                          <FiPlus className="inline mr-1" size={11} /> Add Photo to About Page
+                        </button>
+                      </div>
+                    </div>
+
                     <button onClick={saveAboutContent} className="flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-500 text-white font-semibold text-sm rounded-xl transition-colors">
-                      <FiSave size={14} /> Save About Content
+                      <FiSave size={14} /> Save About Content & Photos
                     </button>
                   </div>
                 )}

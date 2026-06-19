@@ -1,6 +1,6 @@
 'use client'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import Image from 'next/image'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -9,12 +9,12 @@ import { GiWheat, GiPlantSeed, GiOakLeaf, GiFarmTractor } from 'react-icons/gi'
 import { FiCheck, FiArrowRight, FiMapPin } from 'react-icons/fi'
 
 const milestones = [
-  { year: '2008', title: 'Farm Founded', desc: 'Vinayak Karpe established Karpe Farm on our land in Kamalpur, Shrirampur, Maharashtra.' },
-  { year: '2012', title: 'Organic Certification', desc: 'Achieved full organic certification after 4 years of natural farming.' },
-  { year: '2016', title: 'Expansion', desc: 'Expanded to 50+ acres, adding coconut and mango orchards.' },
-  { year: '2020', title: 'Modern Irrigation', desc: 'Installed drip irrigation systems across the entire farm.' },
-  { year: '2022', title: 'Coconut Plantation', desc: 'Planted hundreds of coconut trees, now bearing fruit and symbolising our growth.' },
-  { year: '2025', title: 'Online Platform', desc: 'Launched Karpe Farm online platform for direct farm-to-consumer reach.' },
+  { year: '2008', title: 'Farm Founded', desc: 'Vinayak Karpe established Karpe Farm on our family land in Kamalpur, Shrirampur, Maharashtra.' },
+  { year: '2012', title: 'Organic Certification', desc: 'Achieved full organic certification after 4 years of natural farming practices.' },
+  { year: '2016', title: 'Expansion', desc: 'Added coconut and mango orchards, growing the farm to a thriving multi-crop operation.' },
+  { year: '2020', title: 'Modern Irrigation', desc: 'Installed drip irrigation systems across the farm — saving water, improving yield.' },
+  { year: '2022', title: 'Coconut Plantation', desc: 'Planted hundreds of coconut trees that now stand tall and bear fruit across our farm.' },
+  { year: '2025', title: 'Online Platform', desc: 'Launched Karpe Farm online for direct farm-to-consumer reach across Maharashtra.' },
 ]
 
 const values = [
@@ -24,31 +24,48 @@ const values = [
   { icon: GiWheat, title: 'Community', desc: 'We support local farmers and contribute to our community.' },
 ]
 
-const galleryPhotos = [
-  { src: '/photos/coco-1.jpeg', label: 'Coconut Planting 2022' },
-  { src: '/photos/front view cocnut.jpeg', label: 'Farm Front View 2020' },
-  { src: '/photos/mango.jpeg', label: 'Mango Harvest' },
-  { src: '/photos/m1.jpeg', label: 'Mosambi Orchard' },
-]
+interface ContentData {
+  title?: string
+  description?: string
+  extraData?: {
+    story?: string
+    images?: Array<{ url: string; caption: string }>
+  }
+}
 
 export default function AboutPage() {
+  const [content, setContent] = useState<ContentData | null>(null)
+
+  useEffect(() => {
+    fetch('/api/admin/content?section=about')
+      .then(r => r.json())
+      .then(data => { if (data.content) setContent(data.content) })
+      .catch(() => {})
+  }, [])
+
+  const displayTitle = content?.title || 'A Legacy of Organic Farming'
+  const displayDescription = content?.description || 'Karpe Farm Agriculture was born from a simple dream — to grow the purest, most nutritious food using methods that respect the land.'
+  const displayStory = content?.extraData?.story || ''
+  const adminImages = content?.extraData?.images || []
+
   return (
     <main className="min-h-screen bg-gray-50">
       <NatureBackground />
       <Navbar />
 
-      {/* Hero */}
+      {/* Hero — front view of coconut trees 2020 */}
       <section className="relative pt-16">
         <div className="relative h-72 sm:h-96 overflow-hidden">
-          <Image src="/images/farm-bg.jpg" alt="About Karpe Farm" fill className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-green-900/70 to-gray-900/80" />
+          <img src="/photos/front view cocnut.jpeg" alt="Karpe Farm Front View 2020" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-gray-900/80" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
             <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
               <span className="text-green-300 text-sm font-semibold uppercase tracking-widest block mb-2">Who We Are</span>
-              <h1 className="text-4xl sm:text-6xl font-extrabold text-white mb-4">About Us</h1>
-              <p className="text-gray-300 max-w-xl mx-auto text-lg">
-                A family farm rooted in tradition, growing with purpose
+              <h1 className="text-4xl sm:text-6xl font-extrabold text-white mb-3">About Us</h1>
+              <p className="text-green-200 max-w-lg mx-auto">
+                A family farm rooted in tradition, growing with purpose — Karpe Farm, Kamalpur
               </p>
+              <p className="text-gray-400 text-xs mt-2">Front view of our farm — Photo 2020</p>
             </motion.div>
           </div>
         </div>
@@ -57,56 +74,100 @@ export default function AboutPage() {
       {/* Our Story */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            {/* LEFT: Photo collage */}
             <motion.div
               initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="relative"
+              className="space-y-4"
             >
-              {/* Farm photo gallery collage */}
-              <div className="relative rounded-3xl overflow-hidden aspect-video shadow-2xl">
-                <img src="/photos/tractor - coconuts view.jpeg" alt="Karpe Farm" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-tr from-black/40 to-transparent" />
-              </div>
-              <div className="absolute -bottom-4 -right-4 grid grid-cols-2 gap-2">
-                <div className="w-24 h-24 rounded-xl overflow-hidden shadow-lg border-2 border-white">
-                  <img src="/photos/coco-2.jpeg" alt="Coconut" className="w-full h-full object-cover" />
-                </div>
-                <div className="w-24 h-24 rounded-xl overflow-hidden shadow-lg border-2 border-white">
-                  <img src="/photos/m1.jpeg" alt="Mosambi" className="w-full h-full object-cover" />
+              {/* m1 — mosambi orchard */}
+              <div className="relative rounded-3xl overflow-hidden shadow-xl group" style={{ height: '300px' }}>
+                <img src="/photos/m1.jpeg" alt="Mosambi Orchard" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <span className="text-xs text-green-300 font-semibold uppercase tracking-wider">Mosambi Orchard</span>
+                  <p className="text-white font-bold">Planted 2022 · Photo 2024</p>
+                  <p className="text-gray-300 text-xs">Sweet lime trees in full bloom at Karpe Farm, Kamalpur</p>
                 </div>
               </div>
-              <div className="absolute -top-4 -left-4 bg-white rounded-2xl shadow-xl p-4">
-                <div className="text-3xl font-extrabold text-green-600">15+</div>
-                <div className="text-xs text-gray-600 mt-0.5">Years of farming</div>
+              {/* Two side-by-side photos */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="relative rounded-2xl overflow-hidden shadow-lg" style={{ height: '180px' }}>
+                  <img src="/photos/coco-1.jpeg" alt="Coconut Planting 2022" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <p className="text-white text-xs font-bold">Coconut Plantation</p>
+                    <p className="text-gray-300 text-[10px]">Planted 2022</p>
+                  </div>
+                </div>
+                <div className="relative rounded-2xl overflow-hidden shadow-lg" style={{ height: '180px' }}>
+                  <img src="/photos/coco-2.jpeg" alt="Coconut Trees" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <p className="text-white text-xs font-bold">Coconut Grove</p>
+                    <p className="text-gray-300 text-[10px]">Thriving today</p>
+                  </div>
+                </div>
               </div>
+              {/* Admin-uploaded images */}
+              {adminImages.length > 0 && (
+                <div className="grid grid-cols-2 gap-3">
+                  {adminImages.map((img, i) => (
+                    <div key={i} className="relative rounded-xl overflow-hidden shadow-md" style={{ height: '150px' }}>
+                      <img src={img.url} alt={img.caption} className="w-full h-full object-cover" />
+                      {img.caption && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-2">
+                          <p className="text-white text-xs font-medium">{img.caption}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
 
+            {/* RIGHT: Story text */}
             <motion.div
               initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
+              className="lg:pt-4"
             >
               <span className="text-green-600 font-semibold text-sm uppercase tracking-wider">Our Journey</span>
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-2 mb-6">
-                From a Small Plot to <span className="text-green-600">50+ Acres</span>
+                {displayTitle.includes('Legacy') ? (
+                  <>A Legacy of <span className="text-green-600">Organic Farming</span></>
+                ) : displayTitle}
               </h2>
-              <p className="text-gray-600 leading-relaxed mb-4">
-                Karpe Farm Agriculture was born from a simple dream — to grow the purest, most nutritious food
-                using methods that respect the land. Founded by Vinayak Vishwanath Karpe in 2008 in the heart
-                of Kamalpur, Shrirampur, Maharashtra, our farm began on just 10 acres.
-              </p>
-              <p className="text-gray-600 leading-relaxed mb-4">
-                Over 15 years, guided by patience and dedication, we expanded to over 50 acres,
-                cultivating vegetables, fruits, and specialty crops using 100% organic practices.
-                Our farm follows traditional farming methods enhanced with modern drip irrigation
-                and soil management technology.
-              </p>
-              <p className="text-gray-600 leading-relaxed mb-6">
-                Today, Karpe Farm serves hundreds of families across Maharashtra,
-                delivering farm-fresh produce that is as pure as nature intended.
-              </p>
+              <p className="text-gray-600 leading-relaxed mb-4">{displayDescription}</p>
+
+              {displayStory ? (
+                <p className="text-gray-600 leading-relaxed mb-4">{displayStory}</p>
+              ) : (
+                <>
+                  <p className="text-gray-600 leading-relaxed mb-4">
+                    Founded by Vinayak Vishwanath Karpe in 2008 in the heart of Kamalpur, Shrirampur, Maharashtra.
+                    Our farm grows the finest vegetables, fruits, and specialty crops using 100% organic practices
+                    with traditional farming methods enhanced by modern drip irrigation and soil management technology.
+                  </p>
+                  <p className="text-gray-600 leading-relaxed mb-6">
+                    Today, Karpe Farm serves hundreds of families across Maharashtra,
+                    delivering farm-fresh produce that is as pure as nature intended.
+                    Every fruit and vegetable tells the story of our land, our labor, and our love.
+                  </p>
+                </>
+              )}
+
+              <div className="flex flex-wrap gap-3 mb-6">
+                {['Certified Organic', 'Farm to Consumer', 'No Chemicals', 'Water-Efficient Irrigation'].map((point) => (
+                  <div key={point} className="flex items-center gap-2 px-3 py-1.5 bg-green-50 rounded-full border border-green-100">
+                    <FiCheck className="text-green-500 shrink-0" size={13} />
+                    <span className="text-gray-700 text-sm font-medium">{point}</span>
+                  </div>
+                ))}
+              </div>
 
               <div className="flex items-start gap-2 p-3 bg-green-50 rounded-xl mb-6">
                 <FiMapPin className="text-green-600 shrink-0 mt-0.5" size={16} />
@@ -119,28 +180,6 @@ export default function AboutPage() {
                 Shop Our Produce <FiArrowRight />
               </Link>
             </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Photo Gallery strip */}
-      <section className="py-10 bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {galleryPhotos.map((p) => (
-              <motion.div
-                key={p.src}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                whileHover={{ scale: 1.04 }}
-                className="relative aspect-square rounded-xl overflow-hidden group"
-              >
-                <img src={p.src} alt={p.label} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <p className="absolute bottom-2 left-2 right-2 text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity">{p.label}</p>
-              </motion.div>
-            ))}
           </div>
         </div>
       </section>

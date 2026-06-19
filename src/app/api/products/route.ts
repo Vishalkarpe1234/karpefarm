@@ -12,14 +12,15 @@ function isAdmin(req: NextRequest) {
 }
 
 const defaultProducts = [
-  { name: 'Fresh Onions', description: 'Organically grown red onions from our farm. Rich in antioxidants.', price: 30, unit: 'kg', image: '/images/onions.png', category: 'vegetable', stock: 200, rating: 4.5, reviews: 120, isFeatured: true },
-  { name: 'Brinjal (Bringle)', description: 'Tender purple brinjals, freshly harvested from our fields.', price: 40, unit: 'kg', image: '/images/bringle.png', category: 'vegetable', stock: 150, rating: 4.3, reviews: 85 },
-  { name: 'Fresh Tomatoes', description: 'Juicy red tomatoes grown with natural fertilizers.', price: 25, unit: 'kg', image: '/images/tomato.png', category: 'vegetable', stock: 300, rating: 4.6, reviews: 200, isFeatured: true },
-  { name: 'Lady Finger', description: 'Tender okra freshly picked from our organic garden.', price: 35, unit: 'kg', image: '/images/finger.png', category: 'vegetable', stock: 100, rating: 4.2, reviews: 60 },
-  { name: 'Mosambi (Sweet Lime)', description: 'Vitamin C rich sweet limes from our citrus groves.', price: 60, unit: 'kg', image: '/images/mosambi.png', category: 'fruit', stock: 120, rating: 4.7, reviews: 95, isFeatured: true },
-  { name: 'Fresh Coconuts', description: 'Tender coconuts and dry coconuts from our coconut farm.', price: 45, unit: 'unit', image: '/images/coconut.png', category: 'fruit', stock: 200, rating: 4.8, reviews: 150, isFeatured: true },
-  { name: 'Chiku (Sapodilla)', description: 'Sweet and delicious chiku fruits freshly plucked.', price: 50, unit: 'kg', image: '/images/chiku.png', category: 'fruit', stock: 80, rating: 4.4, reviews: 70 },
-  { name: 'Alphonso Mango', description: 'Premium Alphonso mangoes — the king of fruits from our orchard.', price: 80, unit: 'kg', image: '/images/mango.png', category: 'fruit', stock: 60, rating: 4.9, reviews: 300, isFeatured: true },
+  { name: 'Fresh Onions', description: 'Organically grown red onions from our Kamalpur farm, packed fresh in jute bags. Rich in antioxidants and sulfur compounds that support immunity.', price: 30, unit: 'kg', image: '/photos/onion.jpeg', category: 'vegetable', stock: 200, rating: 4.5, reviews: 120, isFeatured: true },
+  { name: 'Fresh Tomatoes', description: 'Juicy, firm tomatoes grown with natural compost on our farm. No harmful chemicals — just sun, soil, and care.', price: 25, unit: 'kg', image: '/photos/tomato.jpeg', category: 'vegetable', stock: 300, rating: 4.6, reviews: 200, isFeatured: true },
+  { name: 'Mosambi (Sweet Lime)', description: 'Vitamin C-rich mosambi grown in our orchard at Kamalpur. Planted in 2022, these sweet limes are tender, juicy, and full of natural flavor.', price: 60, unit: 'kg', image: '/photos/m1.jpeg', category: 'fruit', stock: 120, rating: 4.7, reviews: 95, isFeatured: true },
+  { name: 'Fresh Coconuts', description: 'Tender coconuts freshly harvested from our coconut grove. Planted in 2022 and now yielding fresh, nutritious coconuts full of natural water and pulp.', price: 45, unit: 'unit', image: '/photos/coco-2.jpeg', category: 'fruit', stock: 200, rating: 4.8, reviews: 150, isFeatured: true },
+  { name: 'Alphonso Mango', description: 'Premium mangoes hand-picked from our orchard at peak ripeness. Sweet, aromatic, and bursting with flavor — from our farm directly to you.', price: 80, unit: 'kg', image: '/photos/mango.jpeg', category: 'fruit', stock: 60, rating: 4.9, reviews: 300, isFeatured: true },
+  { name: 'Fresh Guava (Peru)', description: 'Farm-fresh guava picked at natural ripeness. Crunchy outside, soft inside — rich in Vitamin C and a favorite at our farm. Enjoyed fresh, straight from the tree.', price: 35, unit: 'kg', image: '/photos/eating goova.jpeg', category: 'fruit', stock: 100, rating: 4.6, reviews: 80, isFeatured: true },
+  { name: 'Brinjal (Bringle)', description: 'Tender purple brinjals freshly harvested from our organic fields with natural compost.', price: 40, unit: 'kg', image: '/images/bringle.png', category: 'vegetable', stock: 150, rating: 4.3, reviews: 85 },
+  { name: 'Lady Finger', description: 'Tender okra freshly picked from our organic garden. Best cooked fresh for maximum nutrition.', price: 35, unit: 'kg', image: '/images/finger.png', category: 'vegetable', stock: 100, rating: 4.2, reviews: 60 },
+  { name: 'Chiku (Sapodilla)', description: 'Sweet and delicious chiku fruits freshly plucked from our orchard. Natural caramel-like flavor.', price: 50, unit: 'kg', image: '/images/chiku.png', category: 'fruit', stock: 80, rating: 4.4, reviews: 70 },
 ]
 
 async function seedProducts() {
@@ -38,7 +39,8 @@ export async function GET(req: NextRequest) {
     const featured = searchParams.get('featured')
     const category = searchParams.get('category')
 
-    const query: Record<string, unknown> = { isActive: true }
+    const all = searchParams.get('all')
+    const query: Record<string, unknown> = all === 'true' ? {} : { isActive: true }
     if (featured === 'true') query.isFeatured = true
     if (category && category !== 'all') query.category = category
 

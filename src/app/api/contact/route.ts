@@ -36,6 +36,13 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ contacts })
 }
 
+export async function DELETE(req: NextRequest) {
+  if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { contactId } = await req.json()
+  await prisma.contact.delete({ where: { id: contactId } })
+  return NextResponse.json({ success: true })
+}
+
 export async function PUT(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { contactId, status, adminReply } = await req.json()

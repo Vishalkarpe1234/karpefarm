@@ -30,6 +30,8 @@ model Product {
   price       Float    @default(0)
   unit        String   @default("kg")
   image       String   @default("")
+  image2      String   @default("")
+  image3      String   @default("")
   category    String   @default("vegetable")
   stock       Int      @default(100)
   rating      Float    @default(4.5)

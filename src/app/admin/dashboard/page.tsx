@@ -153,7 +153,7 @@ function AdminDashboardContent() {
   // Admin profile
   const [adminUsername, setAdminUsername] = useState('admin')
   const [adminPhoto, setAdminPhoto] = useState('')
-  const [adminForm, setAdminForm] = useState({ newUsername: '', currentPassword: '', newPassword: '' })
+  const [adminForm, setAdminForm] = useState({ newUsername: '', currentPassword: '', newPassword: '', phone: '' })
   const fileRef = useRef<HTMLInputElement>(null)
 
   // Edit states
@@ -166,7 +166,10 @@ function AdminDashboardContent() {
   // Product add
   const [showAddProduct, setShowAddProduct] = useState(false)
   const [categoryFilter, setCategoryFilter] = useState('all')
-  const [newProduct, setNewProduct] = useState({ name: '', description: '', price: 0, unit: 'kg', image: '/images/onions.png', category: 'vegetable', stock: 100, isFeatured: false })
+  const [newProduct, setNewProduct] = useState({ name: '', description: '', price: 0, unit: 'kg', image: '', image2: '', image3: '', category: 'vegetable', customCategory: '', stock: 100, isFeatured: false })
+  const [customCategories, setCustomCategories] = useState<string[]>([])
+  const [addingCategory, setAddingCategory] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
 
   // Content management
   const [contentTab, setContentTab] = useState('home')
@@ -281,16 +284,52 @@ function AdminDashboardContent() {
   // Products
   async function addProduct() {
     if (!newProduct.name || !newProduct.description || !newProduct.image) {
-      toast.error('Please fill in all required fields')
+      toast.error('Product name, description, and at least one photo are required')
       return
     }
+    const category = newProduct.customCategory || newProduct.category
     try {
-      await axios.post('/api/products', newProduct)
+      await axios.post('/api/products', { ...newProduct, category, customCategory: undefined })
       toast.success('Product added!')
       setShowAddProduct(false)
-      setNewProduct({ name: '', description: '', price: 0, unit: 'kg', image: '/images/onions.png', category: 'vegetable', stock: 100, isFeatured: false })
+      setNewProduct({ name: '', description: '', price: 0, unit: 'kg', image: '', image2: '', image3: '', category: 'vegetable', customCategory: '', stock: 100, isFeatured: false })
       fetchProducts()
-    } catch { toast.error('Failed to add product') }
+    } catch (err: any) { toast.error(err.response?.data?.error || 'Failed to add product — check if database is connected') }
+  }
+
+  function handleProductImageUpload(slot: 'image' | 'image2' | 'image3', e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 3 * 1024 * 1024) { toast.error('Image must be under 3MB'); return }
+    const reader = new FileReader()
+    reader.onload = () => setNewProduct(p => ({ ...p, [slot]: reader.result as string }))
+    reader.readAsDataURL(file)
+  }
+
+  function addCustomCategory() {
+    const name = newCategoryName.trim().toLowerCase()
+    if (!name) return
+    if (!customCategories.includes(name)) setCustomCategories(c => [...c, name])
+    setNewProduct(p => ({ ...p, category: name, customCategory: name }))
+    setNewCategoryName('')
+    setAddingCategory(false)
+  }
+
+  async function deleteContact(contactId: string) {
+    if (!confirm('Delete this message?')) return
+    try {
+      await axios.delete('/api/contact', { data: { contactId } })
+      toast.success('Message deleted')
+      fetchContacts()
+    } catch { toast.error('Failed to delete') }
+  }
+
+  async function saveAdminPhoto() {
+    if (!adminPhoto) { toast.error('No photo selected'); return }
+    try {
+      await axios.put('/api/admin/profile', { photo: adminPhoto })
+      toast.success('Photo saved!')
+    } catch (err: any) { toast.error(err.response?.data?.error || 'Failed to save photo') }
   }
 
   async function updateProduct() {
@@ -782,46 +821,59 @@ function AdminDashboardContent() {
                 {/* Add Product Modal */}
                 {showAddProduct && (
                   <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 overflow-y-auto">
-                    <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-md shadow-2xl my-4">
+                    <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-lg shadow-2xl my-4">
                       <h3 className="text-white font-bold text-lg mb-5">Add New Product</h3>
                       <div className="space-y-3">
-                        {[
-                          { key: 'name', label: 'Product Name *', type: 'text' },
-                          { key: 'price', label: 'Price (₹) *', type: 'number' },
-                          { key: 'stock', label: 'Stock Quantity *', type: 'number' },
-                          { key: 'image', label: 'Image Path (e.g. /images/onions.png)', type: 'text' },
-                        ].map(({ key, label, type }) => (
-                          <div key={key}>
-                            <label className={labelCls}>{label}</label>
-                            <input type={type} value={(newProduct as any)[key]} onChange={e => setNewProduct({ ...newProduct, [key]: type === 'number' ? Number(e.target.value) : e.target.value })} className={inputCls} />
-                          </div>
-                        ))}
-                        <div>
-                          <label className={labelCls}>Unit</label>
-                          <select value={newProduct.unit} onChange={e => setNewProduct({ ...newProduct, unit: e.target.value })} className={inputCls}>
-                            {['kg', 'gram', 'unit', 'dozen', 'litre', 'bundle'].map(u => <option key={u} value={u}>{u}</option>)}
-                          </select>
+                        <div><label className={labelCls}>Product Name *</label>
+                          <input type="text" value={newProduct.name} onChange={e => setNewProduct(p => ({ ...p, name: e.target.value }))} className={inputCls} placeholder="e.g. Fresh Tomatoes" /></div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div><label className={labelCls}>Price (₹) *</label>
+                            <input type="number" value={newProduct.price} onChange={e => setNewProduct(p => ({ ...p, price: Number(e.target.value) }))} className={inputCls} /></div>
+                          <div><label className={labelCls}>Stock Qty *</label>
+                            <input type="number" value={newProduct.stock} onChange={e => setNewProduct(p => ({ ...p, stock: Number(e.target.value) }))} className={inputCls} /></div>
                         </div>
-                        <div>
-                          <label className={labelCls}>Category</label>
-                          <select value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })} className={inputCls}>
-                            {PRODUCT_CATEGORIES.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
-                          </select>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div><label className={labelCls}>Unit</label>
+                            <select value={newProduct.unit} onChange={e => setNewProduct(p => ({ ...p, unit: e.target.value }))} className={inputCls}>
+                              {['kg', 'gram', 'unit', 'dozen', 'litre', 'bundle'].map(u => <option key={u}>{u}</option>)}
+                            </select></div>
+                          <div><label className={labelCls}>Category</label>
+                            <select value={newProduct.category} onChange={e => setNewProduct(p => ({ ...p, category: e.target.value, customCategory: '' }))} className={inputCls}>
+                              {[...PRODUCT_CATEGORIES, ...customCategories].map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
+                            </select></div>
                         </div>
-                        <div>
-                          <label className={labelCls}>Description *</label>
-                          <textarea value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} rows={3} placeholder="Describe this product..." className={textareaCls} />
-                        </div>
-                        <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer">
-                          <input type="checkbox" checked={newProduct.isFeatured} onChange={e => setNewProduct({ ...newProduct, isFeatured: e.target.checked })} className="accent-green-500" />
-                          Feature on Home Page
-                        </label>
-                        {/* Image preview */}
-                        {newProduct.image && (
-                          <div className="relative h-20 bg-gray-800 rounded-lg overflow-hidden">
-                            <Image src={newProduct.image} alt="Preview" fill className="object-contain p-2" onError={() => {}} />
+                        {/* Custom category */}
+                        {!addingCategory ? (
+                          <button onClick={() => setAddingCategory(true)} className="text-green-400 text-xs hover:text-green-300">+ Add Custom Category</button>
+                        ) : (
+                          <div className="flex gap-2">
+                            <input type="text" value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} placeholder="e.g. herbs" className={inputCls + ' flex-1'} />
+                            <button onClick={addCustomCategory} className="px-3 py-2 bg-green-600 text-white text-xs rounded-xl">Add</button>
+                            <button onClick={() => setAddingCategory(false)} className="px-3 py-2 bg-gray-700 text-white text-xs rounded-xl">✕</button>
                           </div>
                         )}
+                        <div><label className={labelCls}>Description *</label>
+                          <textarea value={newProduct.description} onChange={e => setNewProduct(p => ({ ...p, description: e.target.value }))} rows={3} placeholder="Describe this product..." className={textareaCls} /></div>
+                        {/* Photos */}
+                        {(['image', 'image2', 'image3'] as const).map((slot, i) => (
+                          <div key={slot} className="border border-gray-700 rounded-xl p-3 space-y-2">
+                            <label className={labelCls}>{i === 0 ? 'Main Photo *' : `Photo ${i + 1} (optional)`}</label>
+                            <div className="flex gap-2 items-center">
+                              <label className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 border border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-green-500 text-xs text-gray-400 shrink-0">
+                                <FiCamera size={12} /> Upload
+                                <input type="file" accept="image/*" className="hidden" onChange={e => handleProductImageUpload(slot, e)} />
+                              </label>
+                              <input type="text" value={newProduct[slot]} onChange={e => setNewProduct(p => ({ ...p, [slot]: e.target.value }))} placeholder="/photos/tomato.jpeg" className={inputCls + ' flex-1 text-xs'} />
+                            </div>
+                            {newProduct[slot] && (
+                              <img src={newProduct[slot]} alt="preview" className="h-16 rounded-lg object-cover" />
+                            )}
+                          </div>
+                        ))}
+                        <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer">
+                          <input type="checkbox" checked={newProduct.isFeatured} onChange={e => setNewProduct(p => ({ ...p, isFeatured: e.target.checked }))} className="accent-green-500" />
+                          Feature on Home Page
+                        </label>
                         <div className="flex gap-3 pt-2">
                           <button onClick={addProduct} className="flex-1 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-500">Add Product</button>
                           <button onClick={() => setShowAddProduct(false)} className="flex-1 py-2.5 bg-gray-800 text-gray-300 rounded-xl text-sm hover:bg-gray-700">Cancel</button>
@@ -897,7 +949,7 @@ function AdminDashboardContent() {
                     {contacts.length === 0 ? (
                       <div className="text-center py-16"><FiMessageSquare className="text-gray-600 mx-auto mb-3" size={40} /><p className="text-gray-500">No messages yet</p></div>
                     ) : contacts.map((contact) => (
-                      <ContactMessage key={contact._id} contact={contact} onReply={replyContact} />
+                      <ContactMessage key={contact._id} contact={contact} onReply={replyContact} onDelete={deleteContact} />
                     ))}
                   </div>
                 </div>
@@ -1222,7 +1274,8 @@ function AdminDashboardContent() {
               <motion.div key="profile" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 max-w-lg">
                   <h2 className="text-white font-bold text-xl mb-6">Admin Profile</h2>
-                  <div className="flex items-center gap-5 mb-8">
+                  {/* Photo section */}
+                  <div className="flex items-center gap-5 mb-6">
                     <div className="relative">
                       {adminPhoto ? (
                         <img src={adminPhoto} alt="Admin" className="w-20 h-20 rounded-full object-cover border-2 border-green-500" />
@@ -1234,26 +1287,35 @@ function AdminDashboardContent() {
                       </button>
                       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAdminPhotoUpload} />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <p className="text-white font-bold text-lg">{adminUsername}</p>
                       <p className="text-green-400 text-sm">Super Admin</p>
+                      <button onClick={saveAdminPhoto} className="mt-2 flex items-center gap-1.5 px-4 py-1.5 bg-green-700 hover:bg-green-600 text-white text-xs font-semibold rounded-full transition-colors">
+                        <FiCamera size={11} /> Save Photo
+                      </button>
                     </div>
                   </div>
+                  <hr className="border-gray-800 mb-5" />
+                  {/* Profile details */}
                   <div className="space-y-4">
+                    <div>
+                      <label className={labelCls}>Mobile Number</label>
+                      <input type="tel" value={adminForm.phone} onChange={e => setAdminForm(f => ({ ...f, phone: e.target.value }))} placeholder="+91 XXXXX XXXXX" className={inputCls} />
+                    </div>
                     <div>
                       <label className={labelCls}>New Username</label>
                       <input type="text" value={adminForm.newUsername} onChange={e => setAdminForm(f => ({ ...f, newUsername: e.target.value }))} placeholder="Enter new username" className={inputCls} />
                     </div>
                     <div>
-                      <label className={labelCls}>Current Password</label>
+                      <label className={labelCls}>Current Password <span className="text-gray-500">(only if changing password)</span></label>
                       <input type="password" value={adminForm.currentPassword} onChange={e => setAdminForm(f => ({ ...f, currentPassword: e.target.value }))} placeholder="Current password" className={inputCls} />
                     </div>
                     <div>
-                      <label className={labelCls}>New Password</label>
+                      <label className={labelCls}>New Password <span className="text-gray-500">(leave blank to keep current)</span></label>
                       <input type="password" value={adminForm.newPassword} onChange={e => setAdminForm(f => ({ ...f, newPassword: e.target.value }))} placeholder="New password" className={inputCls} />
                     </div>
                     <button onClick={saveAdminProfile} className="w-full py-2.5 bg-green-600 hover:bg-green-500 text-white font-bold rounded-xl text-sm transition-colors">
-                      <FiSave className="inline mr-2" size={14} />Save Profile
+                      <FiSave className="inline mr-2" size={14} />Save Profile Details
                     </button>
                   </div>
                 </div>
@@ -1267,7 +1329,7 @@ function AdminDashboardContent() {
   )
 }
 
-function ContactMessage({ contact, onReply }: { contact: Contact; onReply: (id: string, reply: string) => void }) {
+function ContactMessage({ contact, onReply, onDelete }: { contact: Contact; onReply: (id: string, reply: string) => void; onDelete: (id: string) => void }) {
   const [showReply, setShowReply] = useState(false)
   const [reply, setReply] = useState(contact.adminReply || '')
 
@@ -1289,9 +1351,14 @@ function ContactMessage({ contact, onReply }: { contact: Contact; onReply: (id: 
             </div>
           )}
         </div>
-        <button onClick={() => setShowReply(!showReply)} className="px-3 py-1.5 bg-green-700 hover:bg-green-600 text-white text-xs rounded-lg transition-colors shrink-0">
-          {showReply ? 'Close' : 'Reply'}
-        </button>
+        <div className="flex gap-2 shrink-0">
+          <button onClick={() => setShowReply(!showReply)} className="px-3 py-1.5 bg-green-700 hover:bg-green-600 text-white text-xs rounded-lg transition-colors">
+            {showReply ? 'Close' : 'Reply'}
+          </button>
+          <button onClick={() => onDelete(contact._id)} className="px-3 py-1.5 bg-red-800 hover:bg-red-700 text-white text-xs rounded-lg transition-colors">
+            Delete
+          </button>
+        </div>
       </div>
       {showReply && (
         <div className="flex gap-2 mt-3">

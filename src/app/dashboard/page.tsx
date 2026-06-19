@@ -230,8 +230,7 @@ function DashboardContent() {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: FiHome },
-    { id: 'orders', label: 'My Orders', icon: FiPackage, badge: orders.length },
-    { id: 'cart', label: 'Cart', icon: FiShoppingCart, badge: cart.length },
+    { id: 'orders', label: 'My Requests', icon: FiPackage, badge: orders.length },
     { id: 'notifications', label: 'Notifications', icon: FiBell, badge: unreadCount },
     { id: 'profile', label: 'Profile', icon: FiUser },
   ]
@@ -299,11 +298,10 @@ function DashboardContent() {
               {/* Overview */}
               {activeTab === 'overview' && (
                 <motion.div key="overview" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                     {[
-                      { label: 'Total Orders', value: orders.length, icon: FiPackage, color: 'text-blue-600', bg: 'bg-blue-50' },
-                      { label: 'Cart Items', value: cart.length, icon: FiShoppingCart, color: 'text-orange-600', bg: 'bg-orange-50' },
-                      { label: 'Delivered', value: orders.filter(o => o.status === 'delivered').length, icon: FiCheck, color: 'text-green-600', bg: 'bg-green-50' },
+                      { label: 'Total Requests', value: orders.length, icon: FiPackage, color: 'text-blue-600', bg: 'bg-blue-50' },
+                      { label: 'Approved', value: orders.filter(o => o.status === 'approved' || o.status === 'delivered').length, icon: FiCheck, color: 'text-green-600', bg: 'bg-green-50' },
                       { label: 'Notifications', value: unreadCount, icon: FiBell, color: 'text-red-600', bg: 'bg-red-50' },
                     ].map((stat) => (
                       <div key={stat.label} className="bg-white rounded-2xl p-5 shadow-card border border-gray-100">
@@ -316,22 +314,22 @@ function DashboardContent() {
                     ))}
                   </div>
 
-                  {/* Recent Orders */}
+                  {/* Recent Requests */}
                   <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-6">
-                    <h3 className="font-bold text-gray-900 mb-4">Recent Orders</h3>
+                    <h3 className="font-bold text-gray-900 mb-4">Recent Requests</h3>
                     {orders.slice(0, 3).length === 0 ? (
                       <div className="text-center py-8">
                         <GiPlantSeed className="text-gray-300 mx-auto mb-2" size={40} />
-                        <p className="text-gray-400 text-sm">No orders yet. Start shopping!</p>
+                        <p className="text-gray-400 text-sm">No requests yet. Browse our crops to learn!</p>
                         <Link href="/products" className="mt-3 inline-block text-green-600 text-sm font-medium hover:underline">Browse Products →</Link>
                       </div>
                     ) : (
                       <div className="space-y-3">
                         {orders.slice(0, 3).map((order) => (
-                          <div key={order._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                          <div key={order.id || order._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                             <div>
                               <p className="font-medium text-gray-900 text-sm">{order.productName}</p>
-                              <p className="text-xs text-gray-500">Qty: {order.quantity} · ₹{order.totalAmount}</p>
+                              <p className="text-xs text-gray-500">{order.buyerAddress}</p>
                             </div>
                             <span className={`px-2 py-1 text-xs font-medium rounded-full border ${STATUS_COLORS[order.status] || 'bg-gray-100 text-gray-600'}`}>
                               {STATUS_LABELS[order.status] || order.status}
@@ -349,35 +347,36 @@ function DashboardContent() {
                 <motion.div key="orders" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                   <div className="bg-white rounded-2xl shadow-card border border-gray-100">
                     <div className="p-6 border-b border-gray-100">
-                      <h2 className="font-bold text-gray-900 text-xl">My Orders</h2>
-                      <p className="text-gray-500 text-sm mt-0.5">{orders.length} total orders</p>
+                      <h2 className="font-bold text-gray-900 text-xl">My Learning Requests</h2>
+                      <p className="text-gray-500 text-sm mt-0.5">{orders.length} request{orders.length !== 1 ? 's' : ''} sent</p>
                     </div>
                     <div className="divide-y divide-gray-50">
                       {orders.length === 0 ? (
                         <div className="text-center py-16">
-                          <FiPackage className="mx-auto text-gray-300 mb-4" size={48} />
-                          <p className="text-gray-400 font-medium">No orders yet</p>
+                          <GiPlantSeed className="mx-auto text-gray-300 mb-4" size={48} />
+                          <p className="text-gray-400 font-medium">No requests yet</p>
+                          <p className="text-gray-400 text-sm mt-1">Click "Learn to Grow It" on any product</p>
                           <Link href="/products" className="mt-3 inline-block px-6 py-2 bg-green-600 text-white text-sm font-semibold rounded-full hover:bg-green-700 transition-colors">
-                            Shop Now
+                            Browse Products
                           </Link>
                         </div>
                       ) : (
                         orders.map((order) => (
-                          <div key={order._id} className="p-5 hover:bg-gray-50 transition-colors">
+                          <div key={order.id || order._id} className="p-5 hover:bg-gray-50 transition-colors">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                               <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h4 className="font-semibold text-gray-900">{order.productName}</h4>
+                                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                  <h4 className="font-semibold text-gray-900">Request: {order.productName}</h4>
                                   <span className={`px-2 py-0.5 text-xs font-medium rounded-full border ${STATUS_COLORS[order.status] || ''}`}>
                                     {STATUS_LABELS[order.status] || order.status}
                                   </span>
                                 </div>
                                 <div className="text-sm text-gray-500 space-y-0.5">
-                                  <p>Quantity: {order.quantity} · Total: <span className="font-semibold text-gray-700">₹{order.totalAmount}</span></p>
-                                  <p>Deliver to: {order.buyerAddress}</p>
+                                  <p>Name: {order.buyerName} · Phone: {order.buyerPhone}</p>
+                                  <p>Location: {order.buyerAddress}</p>
                                   {order.adminComment && (
                                     <p className="mt-1 text-green-700 bg-green-50 px-2 py-1 rounded-lg text-xs">
-                                      📝 Admin: {order.adminComment}
+                                      📝 Farm Reply: {order.adminComment}
                                     </p>
                                   )}
                                 </div>

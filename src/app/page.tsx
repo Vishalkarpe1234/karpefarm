@@ -32,7 +32,7 @@ interface Product {
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [buyProduct, setBuyProduct] = useState<Product | null>(null)
+  const [learnProduct, setLearnProduct] = useState<Product | null>(null)
   const [videoError, setVideoError] = useState(false)
   const heroRef = useRef<HTMLDivElement>(null)
   const { scrollY } = useScroll()
@@ -276,7 +276,7 @@ export default function HomePage() {
                   key={product.id}
                   product={product}
                   isLoggedIn={isLoggedIn}
-                  onBuyClick={setBuyProduct}
+                  onLearnClick={setLearnProduct}
                 />
               ))}
             </div>
@@ -400,11 +400,11 @@ export default function HomePage() {
       <Footer />
 
       {/* Buy Modal */}
-      {buyProduct && (
+      {learnProduct && (
         <BuyModal
-          product={buyProduct}
-          onClose={() => setBuyProduct(null)}
-          onSuccess={() => setBuyProduct(null)}
+          product={learnProduct}
+          onClose={() => setLearnProduct(null)}
+          onSuccess={() => setLearnProduct(null)}
         />
       )}
     </main>

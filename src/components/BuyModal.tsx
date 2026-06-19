@@ -1,16 +1,19 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-import { FiX, FiShoppingBag, FiMapPin, FiPhone, FiUser } from 'react-icons/fi'
+import { FiX, FiMapPin, FiPhone, FiUser, FiMessageSquare } from 'react-icons/fi'
+import { GiPlantSeed } from 'react-icons/gi'
 
 interface Product {
-  _id: string
+  id: string
+  _id?: string
   name: string
   price: number
   unit: string
   image: string
+  category: string
 }
 
 interface Props {
@@ -20,32 +23,44 @@ interface Props {
 }
 
 export default function BuyModal({ product, onClose, onSuccess }: Props) {
-  const [form, setForm] = useState({ buyerName: '', buyerPhone: '', buyerAddress: '', quantity: 1 })
+  const [form, setForm] = useState({ name: '', phone: '', location: '', message: '' })
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    async function prefillUser() {
+      try {
+        const res = await axios.get('/api/auth/me')
+        const u = res.data.user
+        setForm(f => ({ ...f, name: u.name || '', phone: u.phone || '' }))
+      } catch {}
+    }
+    if (product) prefillUser()
+  }, [product])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!product) return
-    if (!form.buyerName || !form.buyerPhone || !form.buyerAddress) {
-      toast.error('All fields are required')
+    if (!form.name || !form.phone || !form.location) {
+      toast.error('Please fill in your name, phone, and location')
       return
     }
     setLoading(true)
     try {
+      const productId = product.id || product._id
       await axios.post('/api/orders', {
-        productId: product._id,
+        productId,
         productName: product.name,
-        productPrice: product.price,
-        quantity: form.quantity,
-        buyerName: form.buyerName,
-        buyerPhone: form.buyerPhone,
-        buyerAddress: form.buyerAddress,
+        productPrice: 0,
+        quantity: 1,
+        buyerName: form.name,
+        buyerPhone: form.phone,
+        buyerAddress: form.location + (form.message ? ' | ' + form.message : ''),
       })
-      toast.success('Order placed successfully! Admin will contact you shortly.')
+      toast.success('Request sent! We will contact you directly.')
       onSuccess()
       onClose()
     } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Failed to place order')
+      toast.error(err.response?.data?.error || 'Failed to send request')
     }
     setLoading(false)
   }
@@ -73,9 +88,9 @@ export default function BuyModal({ product, onClose, onSuccess }: Props) {
           <div className="bg-gradient-to-r from-green-600 to-green-700 p-5 text-white">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <FiShoppingBag size={22} />
+                <GiPlantSeed size={22} />
                 <div>
-                  <h3 className="font-bold text-lg">Place Order</h3>
+                  <h3 className="font-bold text-lg">Learn to Grow</h3>
                   <p className="text-green-200 text-sm">{product.name}</p>
                 </div>
               </div>
@@ -85,73 +100,63 @@ export default function BuyModal({ product, onClose, onSuccess }: Props) {
             </div>
           </div>
 
-          {/* Product Summary */}
+          {/* Info banner */}
           <div className="px-5 py-3 bg-green-50 border-b border-green-100">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Unit Price:</span>
-              <span className="font-bold text-green-700">₹{product.price}/{product.unit}</span>
-            </div>
-            <div className="flex items-center justify-between mt-1">
-              <span className="text-sm text-gray-600">Total:</span>
-              <span className="font-bold text-green-700 text-lg">₹{product.price * form.quantity}</span>
-            </div>
+            <p className="text-sm text-green-800 leading-relaxed">
+              Interested in growing <strong>{product.name}</strong>? Share your details —
+              we'll reach out to you directly.
+            </p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-5 space-y-4">
-            {/* Quantity */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Quantity ({product.unit})</label>
-              <div className="flex items-center gap-3">
-                <button type="button" onClick={() => setForm(f => ({ ...f, quantity: Math.max(1, f.quantity - 1) }))}
-                  className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 font-bold text-gray-700 flex items-center justify-center">-</button>
-                <span className="text-lg font-bold w-8 text-center">{form.quantity}</span>
-                <button type="button" onClick={() => setForm(f => ({ ...f, quantity: f.quantity + 1 }))}
-                  className="w-8 h-8 rounded-full bg-green-100 hover:bg-green-200 font-bold text-green-700 flex items-center justify-center">+</button>
-                <span className="text-sm text-gray-500">= ₹{product.price * form.quantity}</span>
-              </div>
-            </div>
-
-            {/* Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                <FiUser className="inline mr-1" size={13} /> Your Full Name
+                <FiUser className="inline mr-1" size={13} /> Your Full Name *
               </label>
               <input
                 type="text"
-                value={form.buyerName}
-                onChange={(e) => setForm(f => ({ ...f, buyerName: e.target.value }))}
+                value={form.name}
+                onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="Enter your name"
-                required
                 className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100"
               />
             </div>
 
-            {/* Phone */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                <FiPhone className="inline mr-1" size={13} /> Mobile Number
+                <FiPhone className="inline mr-1" size={13} /> Mobile Number *
               </label>
               <input
                 type="tel"
-                value={form.buyerPhone}
-                onChange={(e) => setForm(f => ({ ...f, buyerPhone: e.target.value }))}
+                value={form.phone}
+                onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))}
                 placeholder="+91 XXXXX XXXXX"
-                required
                 className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100"
               />
             </div>
 
-            {/* Address */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                <FiMapPin className="inline mr-1" size={13} /> Delivery Address
+                <FiMapPin className="inline mr-1" size={13} /> Your Village / Location *
+              </label>
+              <input
+                type="text"
+                value={form.location}
+                onChange={(e) => setForm(f => ({ ...f, location: e.target.value }))}
+                placeholder="e.g. Shrirampur, Maharashtra"
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <FiMessageSquare className="inline mr-1" size={13} /> What do you want to learn? (optional)
               </label>
               <textarea
-                value={form.buyerAddress}
-                onChange={(e) => setForm(f => ({ ...f, buyerAddress: e.target.value }))}
-                placeholder="Full address with pincode"
-                required
+                value={form.message}
+                onChange={(e) => setForm(f => ({ ...f, message: e.target.value }))}
+                placeholder="e.g. How to grow, best season, soil type, how to contact..."
                 rows={3}
                 className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 resize-none"
               />
@@ -160,15 +165,15 @@ export default function BuyModal({ product, onClose, onSuccess }: Props) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-all shadow-sm btn-farm disabled:opacity-60"
+              className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-all shadow-sm disabled:opacity-60"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Placing Order...
+                  Sending...
                 </span>
               ) : (
-                `Confirm Order · ₹${product.price * form.quantity}`
+                'Send Request — We Will Contact You'
               )}
             </button>
           </form>

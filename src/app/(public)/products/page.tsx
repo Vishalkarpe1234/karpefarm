@@ -11,7 +11,8 @@ import { GiWheat, GiPlantSeed } from 'react-icons/gi'
 import { FiFilter, FiSearch } from 'react-icons/fi'
 
 interface Product {
-  _id: string
+  id: string
+  _id?: string
   name: string
   description: string
   price: number
@@ -40,7 +41,7 @@ export default function ProductsPage() {
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [buyProduct, setBuyProduct] = useState<Product | null>(null)
+  const [learnProduct, setLearnProduct] = useState<Product | null>(null)
 
   useEffect(() => {
     fetchProducts()
@@ -153,10 +154,10 @@ export default function ProductsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filtered.map((product) => (
               <ProductCard
-                key={product._id}
+                key={product.id}
                 product={product}
                 isLoggedIn={isLoggedIn}
-                onBuyClick={setBuyProduct}
+                onLearnClick={setLearnProduct}
               />
             ))}
           </div>
@@ -164,10 +165,10 @@ export default function ProductsPage() {
       </div>
 
       <Footer />
-      {buyProduct && (
+      {learnProduct && (
         <BuyModal
-          product={buyProduct}
-          onClose={() => setBuyProduct(null)}
+          product={learnProduct}
+          onClose={() => setLearnProduct(null)}
           onSuccess={() => {}}
         />
       )}

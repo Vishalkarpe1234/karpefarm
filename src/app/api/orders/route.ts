@@ -22,18 +22,21 @@ export async function POST(req: NextRequest) {
 
   const { productId, productName, productPrice, quantity, buyerName, buyerPhone, buyerAddress } = await req.json()
 
-  if (!productId || !productName || !productPrice || !quantity || !buyerName || !buyerPhone || !buyerAddress) {
-    return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
+  if (!productId || !productName || !buyerName || !buyerPhone || !buyerAddress) {
+    return NextResponse.json({ error: 'Please fill in all required fields' }, { status: 400 })
   }
+
+  const price = productPrice || 0
+  const qty = quantity || 1
 
   const order = await prisma.order.create({
     data: {
       userId: user.userId,
       productId,
       productName,
-      productPrice,
-      quantity,
-      totalAmount: productPrice * quantity,
+      productPrice: price,
+      quantity: qty,
+      totalAmount: price * qty,
       buyerName,
       buyerPhone,
       buyerAddress,
@@ -45,8 +48,8 @@ export async function POST(req: NextRequest) {
     data: {
       userId: user.userId,
       orderId: order.id,
-      title: 'Order Placed Successfully!',
-      message: `Your order for ${productName} (${quantity} ${quantity > 1 ? 'units' : 'unit'}) has been placed. Total: ₹${productPrice * quantity}. We will update you soon!`,
+      title: 'Request Sent!',
+      message: `Your request for "${productName}" has been sent to Karpe Farm. We will contact you at ${buyerPhone} directly. Thank you!`,
       type: 'order',
     },
   })

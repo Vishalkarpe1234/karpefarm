@@ -17,7 +17,13 @@
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
       "Bash(git commit *)",
-      "Bash(cd \"g:\\\\karpefarm-main\" && mkdir -p public/photos && cp photos/*.jpeg public/photos/ && ls public/photos/)"
+      "Bash(cd \"g:\\\\karpefarm-main\" && mkdir -p public/photos && cp photos/*.jpeg public/photos/ && ls public/photos/)",
+      "PowerShell(npx vercel --version 2>$null)",
+      "PowerShell(vercel --version 2>$null)",
+      "Bash(curl -sf https://karpefarm.vercel.app/api/setup)",
+      "Bash(curl -s -X POST https://karpefarm.vercel.app/api/auth/register -H 'Content-Type: application/json' -d '{\"name\":\"Test User\",\"email\":\"testuser123@gmail.com\",\"password\":\"Test@1234\",\"phone\":\"9876543210\"}')",
+      "Bash(curl -s \"https://karpefarm.vercel.app/api/products?featured=true\")",
+      "Bash(python3 -c \"import sys,json; data=json.load\\(sys.stdin\\); [print\\(f\\\\\"  {p['name']} - ₹{p['price']}/{p['unit']}\\\\\"\\) for p in data.get\\('products',[]\\)]\")"
     ],
     "additionalDirectories": [
       "G:\\karpefarm-main\\photos"

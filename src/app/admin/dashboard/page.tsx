@@ -24,7 +24,8 @@ interface User {
 }
 
 interface Order {
-  _id: string
+  id: string
+  _id?: string
   userId: { name: string; email: string; phone?: string }
   productName: string
   productPrice: number
@@ -39,12 +40,15 @@ interface Order {
 }
 
 interface Product {
-  _id: string
+  id: string
+  _id?: string
   name: string
   description: string
   price: number
   unit: string
   image: string
+  image2: string
+  image3: string
   category: string
   stock: number
   isActive: boolean
@@ -272,13 +276,14 @@ function AdminDashboardContent() {
   }
 
   // Orders
-  async function updateOrderStatus(orderId: string) {
+  async function updateOrderStatus(order: Order) {
+    const orderId = order.id || order._id
     try {
       await axios.put('/api/admin/orders', { orderId, status: orderStatus, adminComment: orderComment })
-      toast.success('Order updated — user notified')
+      toast.success('Request updated — user notified')
       setEditOrder(null)
       fetchOrders()
-    } catch { toast.error('Failed to update order') }
+    } catch { toast.error('Failed to update request') }
   }
 
   // Products
@@ -334,16 +339,27 @@ function AdminDashboardContent() {
 
   async function updateProduct() {
     if (!editProduct) return
+    const productId = editProduct.id || editProduct._id
     try {
-      await axios.put('/api/products', { productId: editProduct._id, ...editProduct })
+      await axios.put('/api/products', { productId, ...editProduct, id: undefined, _id: undefined })
       toast.success('Product updated')
       setEditProduct(null)
       fetchProducts()
-    } catch { toast.error('Failed to update product') }
+    } catch (err: any) { toast.error(err.response?.data?.error || 'Failed to update product') }
   }
 
-  async function deleteProduct(productId: string) {
+  function handleEditImageUpload(slot: 'image' | 'image2' | 'image3', e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !editProduct) return
+    if (file.size > 3 * 1024 * 1024) { toast.error('Image must be under 3MB'); return }
+    const reader = new FileReader()
+    reader.onload = () => setEditProduct(p => p ? { ...p, [slot]: reader.result as string } : p)
+    reader.readAsDataURL(file)
+  }
+
+  async function deleteProduct(product: Product) {
     if (!confirm('Delete this product?')) return
+    const productId = product.id || product._id
     try {
       await axios.delete('/api/products', { data: { productId } })
       toast.success('Product removed')
@@ -758,7 +774,7 @@ function AdminDashboardContent() {
                           <textarea value={orderComment} onChange={e => setOrderComment(e.target.value)} rows={3} placeholder="Optional message to the user..." className={textareaCls} />
                         </div>
                         <div className="flex gap-3 pt-1">
-                          <button onClick={() => updateOrderStatus(editOrder._id)} className="flex-1 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-500">Update & Notify User</button>
+                          <button onClick={() => updateOrderStatus(editOrder)} className="flex-1 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-500">Update & Notify User</button>
                           <button onClick={() => setEditOrder(null)} className="flex-1 py-2.5 bg-gray-800 text-gray-300 rounded-xl text-sm hover:bg-gray-700">Cancel</button>
                         </div>
                       </div>
@@ -790,7 +806,7 @@ function AdminDashboardContent() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-5">
                     {filteredProducts.map((product) => (
-                      <div key={product._id} className="bg-gray-800 border border-gray-700 rounded-xl p-4">
+                      <div key={product.id || product._id} className="bg-gray-800 border border-gray-700 rounded-xl p-4">
                         <div className="relative h-28 bg-gray-700 rounded-lg mb-3 overflow-hidden">
                           <Image src={product.image} alt={product.name} fill className="object-contain p-2" />
                           <div className="absolute top-2 left-2 flex gap-1">
@@ -808,7 +824,7 @@ function AdminDashboardContent() {
                           <button onClick={() => setEditProduct(product)} className="flex-1 py-1.5 bg-green-700 hover:bg-green-600 text-white text-xs rounded-lg font-medium transition-colors">
                             <FiEdit className="inline mr-1" size={11} /> Edit
                           </button>
-                          <button onClick={() => deleteProduct(product._id)} className="flex-1 py-1.5 bg-red-900/50 hover:bg-red-800 text-red-400 text-xs rounded-lg transition-colors">
+                          <button onClick={() => deleteProduct(product)} className="flex-1 py-1.5 bg-red-900/50 hover:bg-red-800 text-red-400 text-xs rounded-lg transition-colors">
                             <FiTrash2 className="inline mr-1" size={11} /> Remove
                           </button>
                         </div>
@@ -886,36 +902,51 @@ function AdminDashboardContent() {
                 {/* Edit Product Modal */}
                 {editProduct && (
                   <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 overflow-y-auto">
-                    <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-md shadow-2xl my-4">
+                    <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-lg shadow-2xl my-4">
                       <h3 className="text-white font-bold text-lg mb-5">Edit Product</h3>
                       <div className="space-y-3">
-                        {[
-                          { key: 'name', label: 'Product Name', type: 'text' },
-                          { key: 'price', label: 'Price (₹)', type: 'number' },
-                          { key: 'stock', label: 'Stock', type: 'number' },
-                          { key: 'image', label: 'Image Path', type: 'text' },
-                        ].map(({ key, label, type }) => (
-                          <div key={key}>
-                            <label className={labelCls}>{label}</label>
-                            <input type={type} value={(editProduct as any)[key]} onChange={e => setEditProduct({ ...editProduct, [key]: type === 'number' ? Number(e.target.value) : e.target.value })} className={inputCls} />
+                        <div><label className={labelCls}>Product Name</label>
+                          <input type="text" value={editProduct.name} onChange={e => setEditProduct({ ...editProduct, name: e.target.value })} className={inputCls} /></div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div><label className={labelCls}>Price (₹)</label>
+                            <input type="number" value={editProduct.price} onChange={e => setEditProduct({ ...editProduct, price: Number(e.target.value) })} className={inputCls} /></div>
+                          <div><label className={labelCls}>Stock</label>
+                            <input type="number" value={editProduct.stock} onChange={e => setEditProduct({ ...editProduct, stock: Number(e.target.value) })} className={inputCls} /></div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div><label className={labelCls}>Unit</label>
+                            <select value={editProduct.unit} onChange={e => setEditProduct({ ...editProduct, unit: e.target.value })} className={inputCls}>
+                              {['kg', 'gram', 'unit', 'dozen', 'litre', 'bundle'].map(u => <option key={u}>{u}</option>)}
+                            </select></div>
+                          <div><label className={labelCls}>Category</label>
+                            <select value={editProduct.category} onChange={e => setEditProduct({ ...editProduct, category: e.target.value })} className={inputCls}>
+                              {[...PRODUCT_CATEGORIES, ...customCategories].map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
+                            </select></div>
+                        </div>
+                        <div><label className={labelCls}>Description</label>
+                          <textarea value={editProduct.description || ''} onChange={e => setEditProduct({ ...editProduct, description: e.target.value })} rows={3} className={textareaCls} /></div>
+                        {/* Photo slots */}
+                        {(['image', 'image2', 'image3'] as const).map((slot, i) => (
+                          <div key={slot} className="border border-gray-700 rounded-xl p-3 space-y-2">
+                            <label className={labelCls}>{i === 0 ? 'Main Photo *' : `Photo ${i + 1} (optional)`}</label>
+                            <div className="flex gap-2 items-center">
+                              <label className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 border border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-green-500 text-xs text-gray-400 shrink-0">
+                                <FiCamera size={12} /> Upload
+                                <input type="file" accept="image/*" className="hidden" onChange={e => handleEditImageUpload(slot, e)} />
+                              </label>
+                              <input
+                                type="text"
+                                value={(editProduct as any)[slot] || ''}
+                                onChange={e => setEditProduct({ ...editProduct, [slot]: e.target.value })}
+                                placeholder="/photos/tomato.jpeg"
+                                className={inputCls + ' flex-1 text-xs'}
+                              />
+                            </div>
+                            {(editProduct as any)[slot] && (
+                              <img src={(editProduct as any)[slot]} alt="preview" className="h-16 rounded-lg object-cover" />
+                            )}
                           </div>
                         ))}
-                        <div>
-                          <label className={labelCls}>Unit</label>
-                          <select value={editProduct.unit} onChange={e => setEditProduct({ ...editProduct, unit: e.target.value })} className={inputCls}>
-                            {['kg', 'gram', 'unit', 'dozen', 'litre', 'bundle'].map(u => <option key={u} value={u}>{u}</option>)}
-                          </select>
-                        </div>
-                        <div>
-                          <label className={labelCls}>Category</label>
-                          <select value={editProduct.category} onChange={e => setEditProduct({ ...editProduct, category: e.target.value })} className={inputCls}>
-                            {PRODUCT_CATEGORIES.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
-                          </select>
-                        </div>
-                        <div>
-                          <label className={labelCls}>Description</label>
-                          <textarea value={editProduct.description || ''} onChange={e => setEditProduct({ ...editProduct, description: e.target.value })} rows={3} className={textareaCls} />
-                        </div>
                         <div className="flex items-center gap-4">
                           <label className="flex items-center gap-2 text-gray-300 text-sm cursor-pointer">
                             <input type="checkbox" checked={editProduct.isFeatured} onChange={e => setEditProduct({ ...editProduct, isFeatured: e.target.checked })} className="accent-green-500" />

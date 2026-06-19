@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { FiShoppingCart, FiStar, FiShoppingBag } from 'react-icons/fi'
 import axios from 'axios'
@@ -68,25 +67,19 @@ export default function ProductCard({ product, isLoggedIn, onBuyClick }: Props) 
       className="bg-white rounded-2xl shadow-card overflow-hidden group border border-gray-100 hover:border-green-200 hover:shadow-product transition-all duration-300"
     >
       {/* Image */}
-      <div className="relative h-48 bg-gradient-to-br from-green-50 to-gray-50 overflow-hidden">
+      <div className="relative h-52 overflow-hidden bg-gray-100">
         {product.isFeatured && (
-          <span className="absolute top-3 left-3 z-10 px-2 py-0.5 bg-green-600 text-white text-xs font-bold rounded-full">
+          <span className="absolute top-3 left-3 z-10 px-2 py-0.5 bg-green-600 text-white text-xs font-bold rounded-full shadow">
             Featured
           </span>
         )}
-        <motion.div
+        <motion.img
+          src={product.image}
+          alt={product.name}
           whileHover={{ scale: 1.08 }}
           transition={{ duration: 0.4 }}
-          className="relative w-full h-full"
-        >
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className="object-contain p-4"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-          />
-        </motion.div>
+          className="w-full h-full object-cover"
+        />
         {product.stock < 20 && product.stock > 0 && (
           <span className="absolute bottom-2 right-2 px-2 py-0.5 bg-orange-500 text-white text-xs font-medium rounded-full">
             Low Stock

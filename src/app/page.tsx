@@ -297,84 +297,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Farm Gallery Section */}
-      <section className="py-20 bg-gray-950">
-        <div className="max-w-7xl mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <span className="text-green-400 font-semibold text-sm uppercase tracking-wider">Real Farm Life</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mt-2 mb-4">From Our Farm to Your Table</h2>
-            <p className="text-gray-400 max-w-xl mx-auto">
-              A glimpse into the heart of Karpe Farm — where every harvest tells a story of dedication, nature, and love.
-            </p>
-          </motion.div>
-
-          {/* Gallery — 3 columns, 2 rows, clean no-gap grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-            {[
-              { src: '/photos/coco-2.jpeg', label: 'Coconut Grove', desc: 'Our thriving coconut trees' },
-              { src: '/photos/m1.jpeg', label: 'Mosambi Orchard', desc: 'Sweet lime — planted 2022, photo 2024' },
-              { src: '/photos/mango.jpeg', label: 'Mango Harvest', desc: 'Fresh mangoes from our orchard' },
-              { src: '/photos/onion.jpeg', label: 'Onion Packing', desc: 'Packed fresh at the farm' },
-              { src: '/photos/tomato.jpeg', label: 'Tomato Plants', desc: 'Organic tomato fields' },
-              { src: '/photos/eating goova.jpeg', label: 'Fresh Guava', desc: 'Farm-fresh guava — pure joy' },
-            ].map((photo, i) => (
-              <motion.div
-                key={photo.src}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.07 }}
-                whileHover={{ scale: 1.03 }}
-                className="relative overflow-hidden rounded-2xl shadow-lg group cursor-pointer aspect-square"
-              >
-                <img
-                  src={photo.src}
-                  alt={photo.label}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                  <p className="text-white font-bold text-sm">{photo.label}</p>
-                  <p className="text-gray-300 text-xs mt-0.5">{photo.desc}</p>
-                </div>
-                <div className="absolute top-3 left-3">
-                  <span className="px-2 py-0.5 bg-green-500/90 text-white text-[10px] font-bold rounded-full uppercase tracking-wide backdrop-blur-sm">
-                    Karpe Farm
-                  </span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Bottom row — wide panoramic */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-4 relative overflow-hidden rounded-2xl shadow-xl group cursor-pointer"
-            style={{ height: '280px' }}
-          >
-            <img
-              src="/photos/tractor - coconuts view.jpeg"
-              alt="Karpe Farm coconut view"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/20 to-transparent" />
-            <div className="absolute left-0 top-0 bottom-0 flex items-center px-8">
-              <div>
-                <span className="text-green-400 text-xs font-bold uppercase tracking-widest block mb-2">Est. 2008</span>
-                <h3 className="text-white text-3xl font-extrabold mb-2">Karpe Farm, Kamalpur</h3>
-                <p className="text-gray-300 text-sm max-w-xs">Pure organic farming in the heart of Maharashtra</p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
 
       {/* About Preview */}
       <section className="py-16 bg-white">
@@ -406,7 +328,7 @@ export default function HomePage() {
                 className="absolute -bottom-4 -left-3 w-20 h-20 bg-green-600 rounded-full flex flex-col items-center justify-center shadow-lg border-4 border-white"
               >
                 <GiWheat className="text-white" size={22} />
-                <span className="text-white text-[10px] font-bold mt-0.5">Est 2008</span>
+                <span className="text-white text-[10px] font-bold mt-0.5">Since 1999</span>
               </motion.div>
             </motion.div>
 
@@ -420,7 +342,7 @@ export default function HomePage() {
                 A Legacy of <span className="text-green-600">Organic Farming</span>
               </h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Karpe Farm Agriculture has been nurturing the land in Kamalpur, Shrirampur, Maharashtra for over 15 years.
+                Karpe Farm Agriculture has been nurturing the land in Kamalpur, Shrirampur, Maharashtra since 1999.
                 Founded by Vinayak Vishwanath Karpe, our farm grows the finest vegetables, fruits, and organic produce
                 on fertile farmland.
               </p>

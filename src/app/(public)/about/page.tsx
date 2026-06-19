@@ -9,7 +9,7 @@ import { GiWheat, GiPlantSeed, GiOakLeaf, GiFarmTractor } from 'react-icons/gi'
 import { FiCheck, FiArrowRight, FiMapPin } from 'react-icons/fi'
 
 const milestones = [
-  { year: '2008', title: 'Farm Founded', desc: 'Vinayak Karpe established Karpe Farm on our family land in Kamalpur, Shrirampur, Maharashtra.' },
+  { year: '1999', title: 'Farm Founded', desc: 'Vinayak Karpe established Karpe Farm on our family land in Kamalpur, Shrirampur, Maharashtra.' },
   { year: '2012', title: 'Organic Certification', desc: 'Achieved full organic certification after 4 years of natural farming practices.' },
   { year: '2016', title: 'Expansion', desc: 'Added coconut and mango orchards, growing the farm to a thriving multi-crop operation.' },
   { year: '2020', title: 'Modern Irrigation', desc: 'Installed drip irrigation systems across the farm — saving water, improving yield.' },
@@ -148,7 +148,7 @@ export default function AboutPage() {
               ) : (
                 <>
                   <p className="text-gray-600 leading-relaxed mb-4">
-                    Founded by Vinayak Vishwanath Karpe in 2008 in the heart of Kamalpur, Shrirampur, Maharashtra.
+                    Founded by Vinayak Vishwanath Karpe in 1999 in the heart of Kamalpur, Shrirampur, Maharashtra.
                     Our farm grows the finest vegetables, fruits, and specialty crops using 100% organic practices
                     with traditional farming methods enhanced by modern drip irrigation and soil management technology.
                   </p>
